@@ -1,6 +1,6 @@
 
 // Center the map and the zoom to view CONUS + Alaska + Hawaii
-let conusCoords = [53.73, -119.87];
+let conusCoords = [39.6, -97.0];
 let mapZoomLevel = 5; // Note that the value corresponds to different zoom levels on Open Street and on Google.
 
 
@@ -38,6 +38,7 @@ function createMap(overlayLayers) {
     center: conusCoords,
     zoom: mapZoomLevel,
     layers: [googleSat]
+
   });
 
 
@@ -72,11 +73,14 @@ function createMarkers(response,response2) {
   // Pull the "flight_category property from response.data.
   response.then(response => {
 
-    // // Initialize an array to hold the earthquake circles.
+    // // Initialize an array to hold the airport circles.
     let metarMarkers = [];
 
     console.log(`number of stations reporting: ${response.length}`);
     // // Loop through the stations array.
+    
+    
+    // THIS SECTION USES CIRCLES
     // For each stations, create a circle, and bind a popup with the station's data.
     for (let i = 0; i < response.length; i++) {
       // Create a function to change the color as a function of the flight_category.
@@ -103,8 +107,60 @@ function createMarkers(response,response2) {
         `)
 
         metarMarkers.push(marker);
-    };
-    // <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2>
+    };  // End of the markers with Circles section
+
+    // <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2> // Reminder to convert numbers to text in the popup window. To be removed
+
+
+
+    // // THIS SECTION USES MARKERS WITH ICONS: Works but is slowers than when using Circles
+    // // For each stations, create a circle, and bind a popup with the station's data.
+    // for (let i = 0; i < response.length; i++) {
+    //   // Create a function to change the color as a function of the flight_category.
+    //   function stationColor(flight_category) {
+  
+    //     if (flight_category =="MIFR") { 
+    //       var myICon = L.icon({
+    //         iconUrl: 'MIFR_icon.png',
+    //         iconSize: [18,18],
+    //         iconAnchor: [9, 9],
+    //         popupAnchor: [-3, -76] })}
+    //     else if (flight_category =="IFR") {
+    //       var myICon = L.icon({
+    //         iconUrl: 'IFR_icon.png',
+    //         iconSize: [18,18],
+    //         iconAnchor: [9, 9],
+    //         popupAnchor: [-3, -76] })}
+    //     else if (flight_category =="MVFR") {
+    //       var myICon = L.icon({
+    //         iconUrl: 'MVFR_icon.png',
+    //         iconSize: [18,18],
+    //         iconAnchor: [9, 9],
+    //         popupAnchor: [-3, -76] })}
+    //     else { 
+    //       var myICon = L.icon({
+    //         iconUrl: 'VFR_icon.png',
+    //         iconSize: [18,18],
+    //         iconAnchor: [9, 9],
+    //         popupAnchor: [-3, -76] })};
+
+    //     return myICon;
+    //   };
+    //   // console.log(new Date(response.features[i].properties.time).toUTCString());
+    //   var marker = L.marker([response[i].latitude, response[i].longitude], {
+    //     icon: stationColor(response[i].flight_category)
+    //   })
+    //   .bindPopup(
+    //     `<h2>${response[i].station_id}</h2>  <h3> ${response[i].raw_text}</h3>
+        
+    //     <h4>Time: ${new Date(response[i].observation_time).toUTCString()} </h4>
+    //     `)
+
+    //     metarMarkers.push(marker);
+    // };  // End of the markers with Icon section
+
+
+
 
     // Add airmet and sigmet polygones
     response2.then(response2 => {
@@ -133,7 +189,15 @@ function createMarkers(response,response2) {
               color: airsigmetColor,
               fillColor: airsigmetColor,
               fillOpacity: 0.2,
-            });
+            })
+            .bindPopup(
+              `<h2>${response2[i].hazard}</h2>
+              <h3> Severity: ${response2[i].severity} </h3>
+              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
+              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
+              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
+              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
+              `);
 
             sigConv.push(airsigmetZone)};
           
@@ -144,7 +208,12 @@ function createMarkers(response,response2) {
               color: airsigmetColor,
               fillColor: airsigmetColor,
               fillOpacity: 0.2,
-            });
+            })
+            .bindPopup(
+              `<h2>${response2[i].hazard}</h2>
+              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
+              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
+              `);
 
             airMtnObsc.push(airsigmetZone)};
 
@@ -155,7 +224,15 @@ function createMarkers(response,response2) {
               color: airsigmetColor,
               fillColor: airsigmetColor,
               fillOpacity: 0.2,
-            });
+            })
+            .bindPopup(
+              `<h2>${response2[i].hazard}</h2>
+              <h3> Severity: ${response2[i].severity} </h3>
+              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
+              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
+              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
+              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
+              `);
 
             airIce.push(airsigmetZone)};
 
@@ -166,7 +243,15 @@ function createMarkers(response,response2) {
               color: airsigmetColor,
               fillColor: airsigmetColor,
               fillOpacity: 0.2,
-            });
+            })
+            .bindPopup(
+              `<h2>${response2[i].hazard}</h2>
+              <h3> Severity: ${response2[i].severity} </h3>
+              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
+              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
+              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
+              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
+              `);
 
             airTurb.push(airsigmetZone)};
 
@@ -177,7 +262,14 @@ function createMarkers(response,response2) {
               color: airsigmetColor,
               fillColor: airsigmetColor,
               fillOpacity: 0.2,
-            });
+            })
+            .bindPopup(
+              `<h2>${response2[i].hazard}</h2>
+              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
+              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
+              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
+              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
+              `);
 
             airIFR.push(airsigmetZone)};
 
