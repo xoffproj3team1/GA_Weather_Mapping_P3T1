@@ -68,43 +68,43 @@ function createMap(overlayLayers) {
 
 
 // Create the createMarkers function.
-function createMarkers(response2) {
-  // Pull the "earthquake" property from response.data.
-  // response.then(response => {
+function createMarkers(response,response2) {
+  // Pull the "flight_category property from response.data.
+  response.then(response => {
 
     // // Initialize an array to hold the earthquake circles.
-    // let earthquakeMarkers = [];
+    let metarMarkers = [];
 
-    // console.log(`Last 7-day Earthquake: ${response.features.length}`);
+    console.log(`number of stations reporting: ${response.length}`);
     // // Loop through the stations array.
-    // // For each earthquake, create a circle, and bind a popup with the eartquake's data.
-    // for (let i = 0; i < response.features.length; i++) {
-    //   // Create a function to change the color as a function of the depth.
-    //   function depthColor(depth) {
-    //     if (depth < 10) { colordepth = "#a3f600" }
-    //     else if (depth < 30) { colordepth = "#dcf400" }
-    //     else if (depth < 50) { colordepth = "#f7db11" }
-    //     else if (depth < 70) { colordepth = "#fdb72a" }
-    //     else if (depth < 90) { colordepth = "#fca35d" }
-    //     else { colordepth = "#ff5f65" };
+    // For each stations, create a circle, and bind a popup with the station's data.
+    for (let i = 0; i < response.length; i++) {
+      // Create a function to change the color as a function of the flight_category.
+      function stationColor(flight_category) {
+        var colormetar = "";
+        if (flight_category =="MIFR") { colormetar = "#ab28c3" }
+        else if (flight_category =="IFR") { colormetar = "#c52d0e" }
+        else if (flight_category =="MVFR") { colormetar = "#3458cd" }
+        else { colormetar = "#77cd2d" };
 
-    //     return colordepth;
-    //   };
-    //   // console.log(new Date(response.features[i].properties.time).toUTCString());
-    //   var marker = L.circle([response.features[i].geometry.coordinates[1], response.features[i].geometry.coordinates[0]], {
-    //     color: "",
-    //     fillColor: depthColor(response.features[i].geometry.coordinates[2]),
-    //     fillOpacity: 0.7,
-    //     radius: response.features[i].properties.mag * 10000
-    //   }).bindPopup(
-    //     `<h2>${response.features[i].properties.place}</h2>  <h2>Magnitude ${response.features[i].properties.mag.toLocaleString()}</h2>
-    //     <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2>
-    //     <h4>Time: ${new Date(response.features[i].properties.time).toUTCString()} </h4>
-    //     `)
+        return colormetar;
+      };
+      // console.log(new Date(response.features[i].properties.time).toUTCString());
+      var marker = L.circle([response[i].latitude, response[i].longitude], {
+        color: "",
+        fillColor: stationColor(response[i].flight_category),
+        fillOpacity: 0.7,
+        radius: 5000    // Need to find a way to display the size in pixels
+      })
+      .bindPopup(
+        `<h2>${response[i].station_id}</h2>  <h3> ${response[i].raw_text}</h3>
+        
+        <h4>Time: ${new Date(response[i].observation_time).toUTCString()} </h4>
+        `)
 
-    //   earthquakeMarkers.push(marker);
-    // };
-
+        metarMarkers.push(marker);
+    };
+    // <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2>
 
     // Add airmet and sigmet polygones
     response2.then(response2 => {
@@ -132,7 +132,7 @@ function createMarkers(response2) {
             var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
               color: airsigmetColor,
               fillColor: airsigmetColor,
-              fillOpacity: 0.3,
+              fillOpacity: 0.2,
             });
 
             sigConv.push(airsigmetZone)};
@@ -143,7 +143,7 @@ function createMarkers(response2) {
             var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
               color: airsigmetColor,
               fillColor: airsigmetColor,
-              fillOpacity: 0.3,
+              fillOpacity: 0.2,
             });
 
             airMtnObsc.push(airsigmetZone)};
@@ -154,7 +154,7 @@ function createMarkers(response2) {
             var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
               color: airsigmetColor,
               fillColor: airsigmetColor,
-              fillOpacity: 0.3,
+              fillOpacity: 0.2,
             });
 
             airIce.push(airsigmetZone)};
@@ -165,7 +165,7 @@ function createMarkers(response2) {
             var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
               color: airsigmetColor,
               fillColor: airsigmetColor,
-              fillOpacity: 0.3,
+              fillOpacity: 0.2,
             });
 
             airTurb.push(airsigmetZone)};
@@ -176,7 +176,7 @@ function createMarkers(response2) {
             var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
               color: airsigmetColor,
               fillColor: airsigmetColor,
-              fillOpacity: 0.3,
+              fillOpacity: 0.2,
             });
 
             airIFR.push(airsigmetZone)};
@@ -187,6 +187,7 @@ function createMarkers(response2) {
 
       // if (typeof test3 !== "undefined" && test3 !== null){ 
 
+      var metarLayer = L.layerGroup(metarMarkers);
       var sigConvLayer = L.layerGroup(sigConv);
       var airMtnObscLayer = L.layerGroup(airMtnObsc);
       var airIceLayer = L.layerGroup(airIce);
@@ -194,6 +195,7 @@ function createMarkers(response2) {
       var airIFRLayer = L.layerGroup(airIFR); 
 
       let overlayLayers = {
+        "METAR": metarLayer,
         "SIGMET Convective": sigConvLayer,
         "Mountain Obscuration": airMtnObscLayer,
         "Icing": airIceLayer,
@@ -204,14 +206,14 @@ function createMarkers(response2) {
 
     createMap(overlayLayers);
 
-    // }); // end of the response2 promise
+    }); // end of the response2 promise
 
   }); // end of the response promise
 
 }; // end of the function createMarkers
 
 
-let airsigmetInfo = d3.json("airsigmet_data.json");   
+let airsigmetInfo = d3.json("airsigmet_data.json");   // Need to move it to the resource folder
+let metartInfo = d3.json("metar_data.json");   // Need to move it to the resource folder
 
-
-createMarkers(airsigmetInfo);
+createMarkers(metartInfo,airsigmetInfo);
