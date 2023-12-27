@@ -89,7 +89,8 @@ function createMarkers(response,response2) {
         if (flight_category =="MIFR") { colormetar = "#ab28c3" }
         else if (flight_category =="IFR") { colormetar = "#c52d0e" }
         else if (flight_category =="MVFR") { colormetar = "#3458cd" }
-        else { colormetar = "#77cd2d" };
+        else if (flight_category =="VFR") { colormetar = "#77cd2d" }
+        else { colormetar = "#C8C8C8" };
 
         return colormetar;
       };
@@ -101,7 +102,9 @@ function createMarkers(response,response2) {
         radius: 5000    // Need to find a way to display the size in pixels
       })
       .bindPopup(
-        `<h2>${response[i].station_id}</h2>  <h3> ${response[i].raw_text}</h3>
+        `<h2>${response[i].station_id}</h2>
+
+        <h3> ${response[i].raw_text}</h3>
         
         <h4>Time: ${new Date(response[i].observation_time).toUTCString()} </h4>
         `)
@@ -306,6 +309,6 @@ function createMarkers(response,response2) {
 
 
 let airsigmetInfo = d3.json("airsigmet_data.json");   // Need to move it to the resource folder
-let metartInfo = d3.json("metar_data.json");   // Need to move it to the resource folder
+let metarInfo = d3.json("metar_data.json");   // Need to move it to the resource folder
 
-createMarkers(metartInfo,airsigmetInfo);
+createMarkers(metarInfo,airsigmetInfo);
