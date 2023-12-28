@@ -118,13 +118,17 @@ d3.json("airport_weather_data.json").then(airport_json => {
     // Create a function to change the color as a function of the flight_category.
     function airportColor(i,category){
       let circleColor="";
-      let text1=  `<h2>${airport_json[i].arpt_id} / ${airport_json[i].icao_id} </h2>
+      let text1=  `<h2>${airport_json[i].arpt_id} / ${airport_json[i].icao_id}</h2>
                 <h3> ${airport_json[i].arpt_name}</h3>
+                <h3> Airport Elevation: ${Math.round(airport_json[i].elev)} (ft MSL)</h3>
+                <h3> Airport visibility: ${airport_json[i].visibility_statute_mi} (SM)</h3>
+                <h3> Airport ceiling: ${airport_json[i].cloud_base_ft_agl} (ft AGL)</h3>
                 <h3> ${airport_json[i].raw_text}</h3>
                 <h4>Time: ${new Date(airport_json[i].observation_time).toUTCString()} </h4>
                 `;
       let text2=`<h2>${airport_json[i].arpt_id}</h2>
                 <h3> ${airport_json[i].arpt_name}</h3>
+                <h3> Airport Elevation: ${Math.round(airport_json[i].elev)} (ft)</h3>
                 <h3> No weather information</h3>
                 `;
 
