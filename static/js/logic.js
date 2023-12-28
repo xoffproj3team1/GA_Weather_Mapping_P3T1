@@ -1,29 +1,25 @@
 
 // To recenter the map on the airport entered in the submit field
 function submitForm() {
-  console.log(airport.value);
-  metarInfo.then(metarInfo => {
+  // console.log(airport.value);
+  d3.json("airport_weather_data.json").then(metarInfo => {
     // console.log(metarInfo); // To be removed
     // console.log(metarInfo.length) // To be removed
     let arpt_coord = [];
     for (let i = 0; i < metarInfo.length; i++) {
       // console.log(metarInfo[i].arpt_id);  // To be removed
-      if ((metarInfo[i].arpt_id == airport.value) || (metarInfo[i].station_id == airport.value)) {
+      if ((metarInfo[i].arpt_id == airport.value.toUpperCase()) || (metarInfo[i].icao_id == airport.value.toUpperCase())) {
+        console.log(metarInfo[i].arpt_id == airport.value.toUpperCase());
+        console.log(metarInfo[i].icao_id == airport.value.toUpperCase());
         arpt_coord.push(metarInfo[i].lat_decimal, metarInfo[i].long_decimal);
         console.log(arpt_coord)
         break
       }
     };
-    recenterMap(myMap,arpt_coord);
-    // return arpt_coord
+    myMap.setView(new L.LatLng(arpt_coord[0],arpt_coord[1]), 12);
   })
-  // return arpt_coord    // arpt_coord is not defined outside of the .then loop
 };
 
-function recenterMap(map,arpt_coord) {
-  // map.setView(new L.LatLng(40.737, -73.923), 8); // for testing
-  map.setView(new L.LatLng(arpt_coord), 8);
-};
 
 
 
@@ -387,14 +383,14 @@ d3.json("airsigmet_data.json").then(airport_json => {
   var airTurbHighLayer = L.layerGroup(airTurbHigh);
   var airIFRLayer = L.layerGroup(airIFR);
 
-  sigConvLayer.addTo(myMap);
-  sigTurbLayer.addTo(myMap);
-  sigIceLayer.addTo(myMap);
-  airMtnObscLayer.addTo(myMap);
-  airIceLayer.addTo(myMap);
-  airTurbLowLayer.addTo(myMap);
-  airTurbHighLayer.addTo(myMap);
-  airIFRLayer.addTo(myMap);
+  // sigConvLayer.addTo(myMap);
+  // sigTurbLayer.addTo(myMap);
+  // sigIceLayer.addTo(myMap);
+  // airMtnObscLayer.addTo(myMap);
+  // airIceLayer.addTo(myMap);
+  // airTurbLowLayer.addTo(myMap);
+  // airTurbHighLayer.addTo(myMap);
+  // airIFRLayer.addTo(myMap);
 
   control_layer.addOverlay(sigConvLayer,"SIGMET Convective")
   control_layer.addOverlay(sigTurbLayer,"SIGMET Turbulences")
