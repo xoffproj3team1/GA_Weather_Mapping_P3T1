@@ -1,314 +1,413 @@
 
-// Center the map and the zoom to view CONUS + Alaska + Hawaii
-let conusCoords = [39.6, -97.0];
-let mapZoomLevel = 5; // Note that the value corresponds to different zoom levels on Open Street and on Google.
+// To recenter the map on the airport entered in the submit field
+function submitForm() {
+  console.log(airport.value);
+  metarInfo.then(metarInfo => {
+    // console.log(metarInfo); // To be removed
+    // console.log(metarInfo.length) // To be removed
+    let arpt_coord = [];
+    for (let i = 0; i < metarInfo.length; i++) {
+      // console.log(metarInfo[i].arpt_id);  // To be removed
+      if ((metarInfo[i].arpt_id == airport.value) || (metarInfo[i].station_id == airport.value)) {
+        arpt_coord.push(metarInfo[i].lat_decimal, metarInfo[i].long_decimal);
+        console.log(arpt_coord)
+        break
+      }
+    };
+    recenterMap(myMap,arpt_coord);
+    // return arpt_coord
+  })
+  // return arpt_coord    // arpt_coord is not defined outside of the .then loop
+};
+
+function recenterMap(map,arpt_coord) {
+  // map.setView(new L.LatLng(40.737, -73.923), 8); // for testing
+  map.setView(new L.LatLng(arpt_coord), 8);
+};
 
 
 
-// Create the createMap function.
-function createMap(overlayLayers) {
-
-  // Create the tile layers that will be the background of our map.
-  let street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  });
-
-  let topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-  });
-
-  let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
-        subdomains:['mt0','mt1','mt2','mt3']
-  });
-
-
-  // Create a baseMaps object to hold the map layers.
-  let baseMaps = {
-    "Street Map": street,
-    "Topo": topo,
-    "Satellite Map": googleSat
-  };
-
-  // Create an overlayMaps object to hold the earthquake layer and the tectonic boundaries layer.
-  let overlayMaps = overlayLayers;
-
-  // Create the map object with options preselected for Part2.
-  let myMap = L.map("map", {
-    center: conusCoords,
-    zoom: mapZoomLevel,
-    layers: [googleSat]
-
-  });
-
-
-  // Add the legend. The styling is done in the style.css file
-  var legend = L.control({ position: "bottomright" });
-
-  legend.onAdd = function (map) {
-    var div = L.DomUtil.create("div", "legend");
-    div.innerHTML += "<h4>AirMet SigMet</h4>";
-    div.innerHTML += '<i style="background: #4c7ffb"></i><span>Convective</span><br>';
-    div.innerHTML += '<i style="background: #891e9d"></i><span>Mountain Obscuration</span><br>';
-    div.innerHTML += '<i style="background: #95fbfe"></i><span>Icing</span><br>';
-    div.innerHTML += '<i style="background: #477e17"></i><span>Turbulence</span><br>';
-    div.innerHTML += '<i style="background: #440d8d"></i><span>IFR</span><br>';
-    // div.innerHTML += '<i style="background: #ff5f65"></i><span>>90</span><br>';
-    return div;
-  };
-
-  legend.addTo(myMap);
-
-
-  //   Create a layer control, and pass it baseMaps and overlayMaps. Add the layer control to the map.
-  L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
-  }).addTo(myMap);
-};   // end of the createMap function
 
 
 
-// Create the createMarkers function.
-function createMarkers(response,response2) {
-  // Pull the "flight_category property from response.data.
-  response.then(response => {
 
-    // // Initialize an array to hold the airport circles.
+
+
+//******************************************************************
+// Create the BaseMap.
+
+// Create the tile layers that will be the background of our map.
+let street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+let topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+  attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
+
+let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+  maxZoom: 20,
+  subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+});
+
+
+// Create a baseMaps object to hold the map layers.
+let baseMaps = {
+  "Street Map": street,
+  "Topo": topo,
+  "Satellite Map": googleSat
+};
+
+// Create an overlayMaps object to hold the airport layer and airsigmet layer.
+let overlayMaps = {};
+
+// Create the map object with googleSat preselected.
+let myMap = L.map("map", {
+  center: [39.6, -97.0],
+  zoom: 5,
+  layers: [googleSat]
+
+});
+
+
+// Add the legend. The styling is done in the style.css file
+var legend = L.control({ position: "bottomright" });
+
+legend.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "legend");
+  div.innerHTML += "<h4>SIGMET</h4>";
+  div.innerHTML += '<i style="background: #053fcb"></i><span>Convective</span><br>';
+  div.innerHTML += '<i style="background: #4c7ffb"></i><span>Turbulences</span><br>';
+  div.innerHTML += '<i style="background: #abbce7"></i><span>Icing</span><br>';
+  div.innerHTML += "<h4>AIRMET</h4>";
+  div.innerHTML += '<i style="background: #891e9d"></i><span>Mountain Obscuration</span><br>';
+  div.innerHTML += '<i style="background: #95fbfe"></i><span>Icing</span><br>';
+  div.innerHTML += '<i style="background: #477e17"></i><span>Turbulence Low</span><br>';
+  div.innerHTML += '<i style="background: #85b958"></i><span>Turbulence High</span><br>';
+  div.innerHTML += '<i style="background: #440d8d"></i><span>IFR</span><br>';
+  // div.innerHTML += '<i style="background: #ff5f65"></i><span>>90</span><br>';
+  return div;
+};
+
+legend.addTo(myMap);
+
+
+//   Create a layer control, and pass it baseMaps and overlayMaps. Add the layer control to the map.
+let control_layer = L.control.layers(baseMaps, overlayMaps, {
+  collapsed: false
+})
+control_layer.addTo(myMap);
+
+
+//******************************************************************
+
+
+
+
+
+//******************************************************************
+
+// Addition of the airport makers
+
+// Pull the "flight_category property from response.data.
+d3.json("airport_weather_data.json").then(airport_json => {
+
+    // Initialize an array to hold the airport circles.
     let metarMarkers = [];
 
-    console.log(`number of stations reporting: ${response.length}`);
-    // // Loop through the stations array.
-    
-    
-    // THIS SECTION USES CIRCLES
+    console.log(`number of stations reporting: ${airport_json.length}`);
+    // Loop through the stations array.
     // For each stations, create a circle, and bind a popup with the station's data.
-    for (let i = 0; i < response.length; i++) {
-      // Create a function to change the color as a function of the flight_category.
-      function stationColor(flight_category) {
-        var colormetar = "";
-        if (flight_category =="MIFR") { colormetar = "#ab28c3" }
-        else if (flight_category =="IFR") { colormetar = "#c52d0e" }
-        else if (flight_category =="MVFR") { colormetar = "#3458cd" }
-        else if (flight_category =="VFR") { colormetar = "#77cd2d" }
-        else { colormetar = "#C8C8C8" };
+    
+    // Create a function to change the color as a function of the flight_category.
+    function airportColor(i,category){
+      let circleColor="";
+      let text1=  `<h2>${airport_json[i].arpt_id} / ${airport_json[i].icao_id} </h2>
+                <h3> ${airport_json[i].arpt_name}</h3>
+                <h3> ${airport_json[i].raw_text}</h3>
+                <h4>Time: ${new Date(airport_json[i].observation_time).toUTCString()} </h4>
+                `;
+      let text2=`<h2>${airport_json[i].arpt_id}</h2>
+                <h3> ${airport_json[i].arpt_name}</h3>
+                <h3> No weather information</h3>
+                `;
 
-        return colormetar;
-      };
-      // console.log(new Date(response.features[i].properties.time).toUTCString());
-      var marker = L.circle([response[i].latitude, response[i].longitude], {
+      if (category == "MIFR") {
+        circleColor="#ab28c3";
+        text_metar=text1
+      }
+      else if (category == "IFR") {
+        circleColor="#c52d0e";
+        text_metar=text1
+      }
+      else if (category == "MVFR") {
+        circleColor="#3458cd";
+        text_metar=text1
+      }
+      else if (category == "VFR") {
+        circleColor="#77cd2d";
+        text_metar=text1
+      }
+      else {
+        circleColor="#C8C8C8";
+        text_metar=text2
+      }
+
+      var marker = L.circle([airport_json[i].lat_decimal, airport_json[i].long_decimal], {
         color: "",
-        fillColor: stationColor(response[i].flight_category),
+        fillColor: circleColor,
         fillOpacity: 0.7,
-        radius: 5000    // Need to find a way to display the size in pixels
+        radius: 5000
       })
-      .bindPopup(
-        `<h2>${response[i].station_id}</h2>
+        .bindPopup(text_metar);
+      return marker
+        };
 
-        <h3> ${response[i].raw_text}</h3>
-        
-        <h4>Time: ${new Date(response[i].observation_time).toUTCString()} </h4>
-        `)
-
-        metarMarkers.push(marker);
-    };  // End of the markers with Circles section
-
-    // <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2> // Reminder to convert numbers to text in the popup window. To be removed
-
-
-
-    // // THIS SECTION USES MARKERS WITH ICONS: Works but is slowers than when using Circles
-    // // For each stations, create a circle, and bind a popup with the station's data.
-    // for (let i = 0; i < response.length; i++) {
-    //   // Create a function to change the color as a function of the flight_category.
-    //   function stationColor(flight_category) {
-  
-    //     if (flight_category =="MIFR") { 
-    //       var myICon = L.icon({
-    //         iconUrl: 'MIFR_icon.png',
-    //         iconSize: [18,18],
-    //         iconAnchor: [9, 9],
-    //         popupAnchor: [-3, -76] })}
-    //     else if (flight_category =="IFR") {
-    //       var myICon = L.icon({
-    //         iconUrl: 'IFR_icon.png',
-    //         iconSize: [18,18],
-    //         iconAnchor: [9, 9],
-    //         popupAnchor: [-3, -76] })}
-    //     else if (flight_category =="MVFR") {
-    //       var myICon = L.icon({
-    //         iconUrl: 'MVFR_icon.png',
-    //         iconSize: [18,18],
-    //         iconAnchor: [9, 9],
-    //         popupAnchor: [-3, -76] })}
-    //     else { 
-    //       var myICon = L.icon({
-    //         iconUrl: 'VFR_icon.png',
-    //         iconSize: [18,18],
-    //         iconAnchor: [9, 9],
-    //         popupAnchor: [-3, -76] })};
-
-    //     return myICon;
-    //   };
-    //   // console.log(new Date(response.features[i].properties.time).toUTCString());
-    //   var marker = L.marker([response[i].latitude, response[i].longitude], {
-    //     icon: stationColor(response[i].flight_category)
-    //   })
-    //   .bindPopup(
-    //     `<h2>${response[i].station_id}</h2>  <h3> ${response[i].raw_text}</h3>
-        
-    //     <h4>Time: ${new Date(response[i].observation_time).toUTCString()} </h4>
-    //     `)
-
-    //     metarMarkers.push(marker);
-    // };  // End of the markers with Icon section
-
-
-
-
-    // Add airmet and sigmet polygones
-    response2.then(response2 => {
-      var sigConv = [];
-      var airMtnObsc = [];
-      var airIce = [];
-      var airTurb = [];
-      var airIFR = [];
-
-
-      console.log(`number of entries: ${response2.length}`);
-      
-      for (let i = 0; i < response2.length; i++) {
-
-        var test3 = response2[i].lat_lon_points;  
-
-        // console.log(`row ${i}: lat_lon= ${test3}`); // to be removed
-        // console.log(test3 !== null); // to be removed
-
-        // if (typeof test3 !== "undefined" && test3 !== null){
-        if (test3 !== null){    
-          // console.log(test3 !== null); // to be removed
-          if (response2[i].airsigmet_type=="SIGMET" && response2[i].hazard=="CONVECTIVE") {
-            var airsigmetColor="#4c7ffb";
-            var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
-              color: airsigmetColor,
-              fillColor: airsigmetColor,
-              fillOpacity: 0.2,
-            })
-            .bindPopup(
-              `<h2>${response2[i].hazard}</h2>
-              <h3> Severity: ${response2[i].severity} </h3>
-              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
-              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
-              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
-              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
-              `);
-
-            sigConv.push(airsigmetZone)};
-          
-
-          if (response2[i].airsigmet_type=="AIRMET" && response2[i].hazard=="MTN OBSCN") {
-            var airsigmetColor="#891e9d";
-            var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
-              color: airsigmetColor,
-              fillColor: airsigmetColor,
-              fillOpacity: 0.2,
-            })
-            .bindPopup(
-              `<h2>${response2[i].hazard}</h2>
-              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
-              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
-              `);
-
-            airMtnObsc.push(airsigmetZone)};
-
-
-          if (response2[i].airsigmet_type=="AIRMET" && response2[i].hazard=="ICE") {
-            var airsigmetColor="#95fbfe";
-            var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
-              color: airsigmetColor,
-              fillColor: airsigmetColor,
-              fillOpacity: 0.2,
-            })
-            .bindPopup(
-              `<h2>${response2[i].hazard}</h2>
-              <h3> Severity: ${response2[i].severity} </h3>
-              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
-              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
-              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
-              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
-              `);
-
-            airIce.push(airsigmetZone)};
-
-
-          if (response2[i].airsigmet_type=="AIRMET" && response2[i].hazard=="TURB") {
-            var airsigmetColor="#477e17";
-            var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
-              color: airsigmetColor,
-              fillColor: airsigmetColor,
-              fillOpacity: 0.2,
-            })
-            .bindPopup(
-              `<h2>${response2[i].hazard}</h2>
-              <h3> Severity: ${response2[i].severity} </h3>
-              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
-              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
-              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
-              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
-              `);
-
-            airTurb.push(airsigmetZone)};
-
-
-          if (response2[i].airsigmet_type=="AIRMET" && response2[i].hazard=="IFR") {
-            var airsigmetColor="#440d8d";
-            var airsigmetZone = L.polygon(response2[i].lat_lon_points, {
-              color: airsigmetColor,
-              fillColor: airsigmetColor,
-              fillOpacity: 0.2,
-            })
-            .bindPopup(
-              `<h2>${response2[i].hazard}</h2>
-              <h3>min alt MSL: ${response2[i].min_ft_msl}</h3>
-              <h3>max alt MSL: ${response2[i].max_ft_msl}</h3>
-              <h4>Valid time from: ${new Date(response2[i].valid_time_from).toUTCString()} </h4>
-              <h4>Valid time to: ${new Date(response2[i].valid_time_to).toUTCString()} </h4>
-              `);
-
-            airIFR.push(airsigmetZone)};
-
-          };
-
+    
+    for (let i = 0; i < airport_json.length; i++) {
+      metarMarkers.push(airportColor(i,airport_json[i].flight_category))
       };
 
-      // if (typeof test3 !== "undefined" && test3 !== null){ 
+    
+    // Create an overlayMaps object to hold the airport layer.
+    var metarLayer = L.layerGroup(metarMarkers);
+    // addOverLay(metarLayer,'Metar')
+    metarLayer.addTo(myMap);
+    control_layer.addOverlay(metarLayer,"METAR")
 
-      var metarLayer = L.layerGroup(metarMarkers);
-      var sigConvLayer = L.layerGroup(sigConv);
-      var airMtnObscLayer = L.layerGroup(airMtnObsc);
-      var airIceLayer = L.layerGroup(airIce);
-      var airTurLayer = L.layerGroup(airTurb);
-      var airIFRLayer = L.layerGroup(airIFR); 
 
-      let overlayLayers = {
-        "METAR": metarLayer,
-        "SIGMET Convective": sigConvLayer,
-        "Mountain Obscuration": airMtnObscLayer,
-        "Icing": airIceLayer,
-        "Turbulence": airTurLayer,
-        "IFR": airIFRLayer,
+  });
+
+
+//     // <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2> // Reminder to convert numbers to text in the popup window. To be removed
+//     // ***********************************************************************************************
+//******************************************************************
+
+
+
+
+//******************************************************************
+// Add airmet and sigmet polygones
+
+d3.json("airsigmet_data.json").then(airport_json => {
+
+  var sigConv = [];
+  var sigTurb = []
+  var sigIce = []
+  var airMtnObsc = [];
+  var airIce = [];
+  var airTurbHigh = [];
+  var airTurbLow = [];
+  var airIFR = [];
+
+
+  console.log(`number of AIRMET/SIGMET entries: ${airport_json.length}`);
+
+  for (let i = 0; i < airport_json.length; i++) {
+
+    var test3 = airport_json[i].lat_lon_points;
+
+    // console.log(`row ${i}: lat_lon= ${test3}`); // to be removed
+    // console.log(test3 !== null); // to be removed
+
+    // if (typeof test3 !== "undefined" && test3 !== null){
+    if (test3 !== null) {
+      // console.log(test3 !== null); // to be removed
+      if (airport_json[i].airsigmet_type == "SIGMET" && airport_json[i].hazard == "CONVECTIVE") {
+        var airsigmetColor = "#053fcb";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+          <h3> Severity: ${airport_json[i].severity} </h3>
+          <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
+
+        sigConv.push(airsigmetZone)
+      };
+
+      if (airport_json[i].airsigmet_type == "SIGMET" && airport_json[i].hazard == "TURB") {
+        var airsigmetColor = "#4c7ffb";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+          <h3> Severity: ${airport_json[i].severity} </h3>
+          <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
+
+        sigTurb.push(airsigmetZone)
+      };
+
+      if (airport_json[i].airsigmet_type == "SIGMET" && airport_json[i].hazard == "ICE") {
+        var airsigmetColor = "#abbce7";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+          <h3> Severity: ${airport_json[i].severity} </h3>
+          <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
+
+        sigIce.push(airsigmetZone)
       };
 
 
-    createMap(overlayLayers);
+      if (airport_json[i].airsigmet_type == "AIRMET" && airport_json[i].hazard == "MTN OBSCN") {
+        var airsigmetColor = "#891e9d";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+            <h3> Severity: ${airport_json[i].raw_text} </h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
 
-    }); // end of the response2 promise
-
-  }); // end of the response promise
-
-}; // end of the function createMarkers
+        airMtnObsc.push(airsigmetZone)
+      };
 
 
-let airsigmetInfo = d3.json("airsigmet_data.json");   // Need to move it to the resource folder
-let metarInfo = d3.json("metar_data.json");   // Need to move it to the resource folder
+      if (airport_json[i].airsigmet_type == "AIRMET" && airport_json[i].hazard == "ICE") {
+        var airsigmetColor = "#95fbfe";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+          <h3> Severity: ${airport_json[i].severity} </h3>
+          <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
 
-createMarkers(metarInfo,airsigmetInfo);
+        airIce.push(airsigmetZone)
+      };
+
+
+      if (airport_json[i].airsigmet_type == "AIRMET" && airport_json[i].hazard == "TURB"&& airport_json[i].min_ft_msl <=12000) {
+        var airsigmetColor = "#477e17";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+          <h3> Severity: ${airport_json[i].severity} </h3>
+          <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
+
+        airTurbLow.push(airsigmetZone)
+      };
+
+
+      if (airport_json[i].airsigmet_type == "AIRMET" && airport_json[i].hazard == "TURB" && airport_json[i].min_ft_msl >12000) {
+        var airsigmetColor = "#85b958";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+          <h3> Severity: ${airport_json[i].severity} </h3>
+          <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
+
+        airTurbHigh.push(airsigmetZone)
+      };
+
+
+      if (airport_json[i].airsigmet_type == "AIRMET" && airport_json[i].hazard == "IFR") {
+        var airsigmetColor = "#440d8d";
+        var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
+          color: airsigmetColor,
+          fillColor: airsigmetColor,
+          fillOpacity: 0.2,
+        })
+          .bindPopup(
+            `<h2>${airport_json[i].hazard}</h2>
+            <h3> Details: ${airport_json[i].raw_text} </h3>
+          <h3>min alt MSL: ${airport_json[i].min_ft_msl}</h3>
+          <h3>max alt MSL: ${airport_json[i].max_ft_msl}</h3>
+          <h4>Valid time from: ${new Date(airport_json[i].valid_time_from).toUTCString()} </h4>
+          <h4>Valid time to: ${new Date(airport_json[i].valid_time_to).toUTCString()} </h4>
+          `);
+
+        airIFR.push(airsigmetZone)
+      };
+
+    };
+
+  };
+
+  var sigConvLayer = L.layerGroup(sigConv);
+  var sigTurbLayer = L.layerGroup(sigTurb);
+  var sigIceLayer = L.layerGroup(sigIce);
+  var airMtnObscLayer = L.layerGroup(airMtnObsc);
+  var airIceLayer = L.layerGroup(airIce);
+  var airTurbLowLayer = L.layerGroup(airTurbLow);
+  var airTurbHighLayer = L.layerGroup(airTurbHigh);
+  var airIFRLayer = L.layerGroup(airIFR);
+
+  sigConvLayer.addTo(myMap);
+  sigTurbLayer.addTo(myMap);
+  sigIceLayer.addTo(myMap);
+  airMtnObscLayer.addTo(myMap);
+  airIceLayer.addTo(myMap);
+  airTurbLowLayer.addTo(myMap);
+  airTurbHighLayer.addTo(myMap);
+  airIFRLayer.addTo(myMap);
+
+  control_layer.addOverlay(sigConvLayer,"SIGMET Convective")
+  control_layer.addOverlay(sigTurbLayer,"SIGMET Turbulences")
+  control_layer.addOverlay(sigIceLayer,"SIGMET Icing")
+  control_layer.addOverlay(airMtnObscLayer,"Mountain Obscuration")
+  control_layer.addOverlay(airIceLayer,"Icing")
+  control_layer.addOverlay(airTurbLowLayer,"Turbulences Low")
+  control_layer.addOverlay(airTurbHighLayer,"Turbulences High >FL120")
+  control_layer.addOverlay(airIFRLayer,"IFR")
+
+
+});
+//******************************************************************
+
+
+
