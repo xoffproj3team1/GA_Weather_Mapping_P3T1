@@ -137,7 +137,7 @@ d3.json("airport_weather_data.json").then(airport_json => {
                 <h3> No weather information</h3>
                 `;
 
-      if (category == "MIFR") {
+      if (category == "LIFR") {
         circleColor="#ab28c3";
         text_metar=text1
       }
