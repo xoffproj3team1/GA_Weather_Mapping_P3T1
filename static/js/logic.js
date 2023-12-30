@@ -3,8 +3,7 @@
 function submitForm() {
   // console.log(airport.value);
   d3.json("airport_weather_data.json").then(metarInfo => {
-    // console.log(metarInfo); // To be removed
-    // console.log(metarInfo.length) // To be removed
+
     let arpt_coord = [];
     for (let i = 0; i < metarInfo.length; i++) {
       // console.log(metarInfo[i].arpt_id);  // To be removed
@@ -45,6 +44,7 @@ let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
   maxZoom: 20,
   subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
 });
+
 
 let faaSectional = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{-y}.png');
 let faaIFRLow = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/enrl/{z}/{x}/{-y}.png');
@@ -99,94 +99,76 @@ let control_layer = L.control.layers(baseMaps, overlayMaps, {
 })
 control_layer.addTo(myMap);
 
-
 //******************************************************************
 
 
 
 
-
 //******************************************************************
 
-// Addition of the airport makers
+// Addition of the airport makers from the fully populated json file
 
 // Pull the "flight_category property from response.data.
-d3.json("airport_weather_data.json").then(airport_json => {
+d3.json("airport_info_full_data.json").then(airport_json => {
 
-    // Initialize an array to hold the airport circles.
-    let metarMarkers = [];
+  // Initialize an array to hold the airport circles.
+  let metarMarkers = [];
 
-    console.log(`number of stations reporting: ${airport_json.length}`);
-    // Loop through the stations array.
-    // For each stations, create a circle, and bind a popup with the station's data.
-    
-    // Create a function to change the color as a function of the flight_category.
-    function airportColor(i,category){
-      let circleColor="";
-      let text1=  `<h2>${airport_json[i].arpt_id} / ${airport_json[i].icao_id}</h2>
-                <h3> ${airport_json[i].arpt_name}</h3>
-                <h3> Airport Elevation: ${Math.round(airport_json[i].elev)} (ft MSL)</h3>
-                <h3> Airport visibility: ${airport_json[i].visibility_statute_mi} (SM)</h3>
-                <h3> Airport ceiling: ${airport_json[i].cloud_base_ft_agl} (ft AGL)</h3>
-                <h3> ${airport_json[i].raw_text}</h3>
-                <h4>Time: ${new Date(airport_json[i].observation_time).toUTCString()} </h4>
-                `;
-      let text2=`<h2>${airport_json[i].arpt_id}</h2>
-                <h3> ${airport_json[i].arpt_name}</h3>
-                <h3> Airport Elevation: ${Math.round(airport_json[i].elev)} (ft)</h3>
-                <h3> No weather information</h3>
-                `;
+  console.log(`number of stations reporting: ${airport_json.length}`);
+  // Loop through the stations array.
+  // For each stations, create a circle, and bind a popup with the station's data.
+  
+  // Create a function to change the color as a function of the flight_category.
+  function airportColor(i,category){
+    let circleColor="";
 
-      if (category == "LIFR") {
-        circleColor="#ab28c3";
-        text_metar=text1
-      }
-      else if (category == "IFR") {
-        circleColor="#c52d0e";
-        text_metar=text1
-      }
-      else if (category == "MVFR") {
-        circleColor="#3458cd";
-        text_metar=text1
-      }
-      else if (category == "VFR") {
-        circleColor="#77cd2d";
-        text_metar=text1
-      }
-      else {
-        circleColor="#C8C8C8";
-        text_metar=text2
-      }
+    if (category == "LIFR") {
+      circleColor="#ab28c3"
+    }
+    else if (category == "IFR") {
+      circleColor="#c52d0e"
+    }
+    else if (category == "MVFR") {
+      circleColor="#3458cd"
+    }
+    else if (category == "VFR") {
+      circleColor="#77cd2d"
+    }
+    else {
+      circleColor="#C8C8C8"
+    }
 
-      var marker = L.circle([airport_json[i].lat_decimal, airport_json[i].long_decimal], {
-        color: "",
-        fillColor: circleColor,
-        fillOpacity: 0.7,
-        radius: 5000
-      })
-        .bindPopup(text_metar);
-      return marker
-        };
-
-    
-    for (let i = 0; i < airport_json.length; i++) {
-      metarMarkers.push(airportColor(i,airport_json[i].flight_category))
+    var marker = L.circle([airport_json[i].lat_decimal, airport_json[i].long_decimal], {
+      color: "",
+      fillColor: circleColor,
+      fillOpacity: 0.7,
+      radius: 5000
+    })
+      .bindPopup(airport_json[i].popup_text);
+    return marker
       };
 
-    
-    // Create an overlayMaps object to hold the airport layer.
-    var metarLayer = L.layerGroup(metarMarkers);
-    // addOverLay(metarLayer,'Metar')
-    metarLayer.addTo(myMap);
-    control_layer.addOverlay(metarLayer,"METAR")
+  var circleObject ={};
+  for (let i = 0; i < airport_json.length; i++) {   
+    metarMarkers.push(airportColor(i,airport_json[i].flight_category))
+    };
+
+  
+  // Create an overlayMaps object to hold the airport layer.
+  var metarLayer = L.layerGroup(metarMarkers);
+
+  metarLayer.addTo(myMap);
+  control_layer.addOverlay(metarLayer,"METAR")
+
+});
 
 
-  });
-
-
-//     // <h2>Depth ${response.features[i].geometry.coordinates[2].toLocaleString()} km</h2> // Reminder to convert numbers to text in the popup window. To be removed
-//     // ***********************************************************************************************
 //******************************************************************
+
+
+
+
+
 
 
 
@@ -212,12 +194,9 @@ d3.json("airsigmet_data.json").then(airport_json => {
 
     var test3 = airport_json[i].lat_lon_points;
 
-    // console.log(`row ${i}: lat_lon= ${test3}`); // to be removed
-    // console.log(test3 !== null); // to be removed
 
-    // if (typeof test3 !== "undefined" && test3 !== null){
     if (test3 !== null) {
-      // console.log(test3 !== null); // to be removed
+
       if (airport_json[i].airsigmet_type == "SIGMET" && airport_json[i].hazard == "CONVECTIVE") {
         var airsigmetColor = "#053fcb";
         var airsigmetZone = L.polygon(airport_json[i].lat_lon_points, {
@@ -392,14 +371,7 @@ d3.json("airsigmet_data.json").then(airport_json => {
   var airTurbHighLayer = L.layerGroup(airTurbHigh);
   var airIFRLayer = L.layerGroup(airIFR);
 
-  // sigConvLayer.addTo(myMap);
-  // sigTurbLayer.addTo(myMap);
-  // sigIceLayer.addTo(myMap);
-  // airMtnObscLayer.addTo(myMap);
-  // airIceLayer.addTo(myMap);
-  // airTurbLowLayer.addTo(myMap);
-  // airTurbHighLayer.addTo(myMap);
-  // airIFRLayer.addTo(myMap);
+
 
   control_layer.addOverlay(sigConvLayer,"SIGMET Convective")
   control_layer.addOverlay(sigTurbLayer,"SIGMET Turbulences")

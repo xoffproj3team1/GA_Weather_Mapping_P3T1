@@ -44,3 +44,33 @@ html {
   background-size: 18px;
   background-color: rgba(255, 255, 255, 1);
 }
+
+
+/* test styling popup */
+.arpt_id{
+  font-size: 20px;
+  color: #583bcc;
+  font-weight: bold;
+}
+
+.arpt_name{
+  font-size: 20px;
+  color: #cc3bb9;
+  font-weight: bold;
+}
+
+.cross_wind{
+  padding-inline-start: 20px;
+}
+
+.head_wind{
+  padding-inline-start: 20px;
+}
+
+.rwy_end_id{
+  font-weight: bold;
+}
+
+.observation_time{
+  font-size: 10px;
+}
