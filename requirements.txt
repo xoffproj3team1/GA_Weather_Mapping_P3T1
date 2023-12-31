@@ -1,0 +1,11 @@
+pandas
+os
+python-dotenv
+sqlalchemy
+psycopg2
+numpy
+pprint
+json
+gunicorn
+flask
+requests
