@@ -74,3 +74,8 @@ html {
 .observation_time{
   font-size: 10px;
 }
+
+.rwy_id{
+  font-weight: bold;
+  font-size: 15px;
+}
