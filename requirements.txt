@@ -1,5 +1,5 @@
 pandas
-os
+python-os
 python-dotenv
 sqlalchemy
 psycopg2
