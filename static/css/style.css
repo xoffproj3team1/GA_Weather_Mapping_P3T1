@@ -125,6 +125,16 @@ html {
   padding-bottom: 0px;
 }
 
+.rwy_width{
+  /* font-size: 15px; */
+  color: #000000;
+  /* font-weight: bold; */
+  margin-top: -8px;
+  padding-top: 0px;
+  margin-bottom: -10px;
+  padding-bottom: 0px;
+}
+
 .rwy_end_id{
   /* font-size: 15px; */
   color: #000000;
