@@ -46,36 +46,132 @@ html {
 }
 
 
-/* test styling popup */
+/* Styling popup */
 .arpt_id{
-  font-size: 20px;
-  color: #583bcc;
+  font-size: 30px;
+  color: #000000;
   font-weight: bold;
+  display: inline-block;
+}
+
+.icao_id{
+  font-size: 15px;
+  color: #000000;
+  font-weight: bold;
+  display: inline-block;
 }
 
 .arpt_name{
-  font-size: 20px;
-  color: #cc3bb9;
+  font-size: 15px;
+  color: #000000;
   font-weight: bold;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 5px;
 }
 
-.cross_wind{
-  padding-inline-start: 20px;
+.elev{
+  font-size: 15px;
+  color: #000000;
+  font-weight: bold;
+  margin-bottom: 0px;
+  margin-bottom: -5px;
+
 }
 
-.head_wind{
-  padding-inline-start: 20px;
+.tpa{
+  /* font-size: 15px; */
+  color: #000000;
+  /* font-weight: bold; */
+  margin-top: -10px;
+  padding-top: 0px;
+}
+
+.visibility_statute_mi{
+  font-size: 15px;
+  color: #000000;
+  font-weight: bold;
+  margin-bottom: 0px;
+  padding-bottom: -10px;
+}
+
+.cloud_base_ft_agl{
+  font-size: 15px;
+  color: #000000;
+  font-weight: bold;
+  margin-top: -10px;
+  padding-top: 0px;
+}
+
+.rwy_id{
+  font-size: 20px;
+  color: #000000;
+  font-weight: bold;
+  /* margin-top: 5px; */
+  padding-top: 0px;
+  margin-bottom: -5px;
+  padding-bottom: 0px;
+  border-top: 1px solid #000000;
+  padding-top: 5px;
+
+}
+
+.rwy_len{
+  /* font-size: 15px; */
+  color: #000000;
+  /* font-weight: bold; */
+  margin-top: -10px;
+  padding-top: 0px;
+  margin-bottom: -10px;
+  padding-bottom: 0px;
 }
 
 .rwy_end_id{
+  /* font-size: 15px; */
+  color: #000000;
   font-weight: bold;
+  margin-top: -5px;
+  padding-top: 0px;
+  /* margin-bottom: -15px; */
+  /* padding-bottom: 0px; */
+  display: inline-block;
+}
+
+.RP{
+  display: inline-block;
+  color: #f00c0c;
+}
+.cross_wind{
+  padding-inline-start: 40px;
+  margin-top: -10px;
+  padding-top: 0px;
+  margin-bottom: -5px;
+  padding-bottom: 0px;
+}
+
+.head_wind{
+  padding-inline-start: 40px;
+  margin-top: -10px;
+  padding-top: 0px;
+  margin-bottom: -5px;
+  /* padding-bottom: 0px */
+}
+
+/* .rwy_end_id{
+  font-weight: bold;
+} */
+
+
+
+.raw_text{
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 10px;
+  margin-bottom: -5px;
+  border-top: 1px solid #000000;
+  padding-top: 5px;
 }
 
 .observation_time{
   font-size: 10px;
-}
-
-.rwy_id{
-  font-weight: bold;
-  font-size: 15px;
+  margin-top: -5px;
 }

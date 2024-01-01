@@ -74,7 +74,7 @@ with open(output_path, "w") as file:
 # __To refresh the metar table in the Render database__
 
 # %%
-# Test to refresh the metar table
+# Empty the metar table
 
 load_dotenv()
 db_url = os.environ.get("link_render")
@@ -86,7 +86,7 @@ cursor.close()
 connection.close()
 
 # %%
-# Test to populate the empty table from a json file
+# Repopulate the empty table from a json file
 load_dotenv()
 db_url = os.environ.get("link_render")
 connection = psycopg2.connect(db_url)
@@ -106,64 +106,64 @@ cursor.execute(query_sql, (data,))
 connection.commit()
 
 # %% [markdown]
-# __To download a new json file made of the joining of airport data and weather data__
+# __To download a new json file made of the joining of airport data and weather data__ (not used anymore: To be deleted)
 
 # %%
-# download the output of a query across multiple tables with all the active public airport with or without weather information.
-# Will be used to populate the makers that do not have METAR information.
-# There is only one row per airport so only one runway is listed even if the airport as more.
-# More parameters can be added to complete the info on the popup window.
+# # download the output of a query across multiple tables with all the active public airport with or without weather information.
+# # Will be used to populate the makers that do not have METAR information.
+# # There is only one row per airport so only one runway is listed even if the airport as more.
+# # More parameters can be added to complete the info on the popup window.
 
-load_dotenv()
-db_url = os.environ.get("link_render")
+# load_dotenv()
+# db_url = os.environ.get("link_render")
+
+# # query="""
+# #     SELECT DISTINCT ON (arpt_id)
+# # 	arpt_id, icao_id, metar.station_id, arpt_name, apt_rwy.rwy_id, lat_decimal, long_decimal, metar.observation_time, metar.wind_speed_kt, metar.flight_category, metar.raw_text
+# #     FROM apt_rwy
+# #     JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
+# #     FULL JOIN metar ON metar.station_id = apt_base.icao_id
+# #     WHERE facility_use_code='PU' AND site_type_code='A' AND arpt_status='O';
+# #     """
 
 # query="""
-#     SELECT DISTINCT ON (arpt_id)
-# 	arpt_id, icao_id, metar.station_id, arpt_name, apt_rwy.rwy_id, lat_decimal, long_decimal, metar.observation_time, metar.wind_speed_kt, metar.flight_category, metar.raw_text
-#     FROM apt_rwy
-#     JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
-#     FULL JOIN metar ON metar.station_id = apt_base.icao_id
-#     WHERE facility_use_code='PU' AND site_type_code='A' AND arpt_status='O';
-#     """
-
-query="""
-SELECT DISTINCT ON (arpt_id)
-    arpt_id, icao_id, metar.station_id, arpt_name, apt_rwy.rwy_id, lat_decimal, metar.latitude, long_decimal, metar.longitude, metar.observation_time, metar.wind_speed_kt, metar.flight_category, metar.raw_text, elev, metar.visibility_statute_mi, metar.cloud_base_ft_agl
-FROM apt_rwy
-JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
-FULL JOIN metar ON (RIGHT(metar.station_id, LENGTH(metar.station_id) - 1)) = apt_base.arpt_id
-WHERE facility_use_code='PU' AND site_type_code='A' AND arpt_status='O' AND
-CASE
-	WHEN metar.station_id IS NOT NULL
-	THEN (@(lat_decimal - metar.latitude) <1) AND (@(long_decimal - metar.longitude) <1) AND site_type_code='A'
+# SELECT DISTINCT ON (arpt_id)
+#     arpt_id, icao_id, metar.station_id, arpt_name, apt_rwy.rwy_id, lat_decimal, metar.latitude, long_decimal, metar.longitude, metar.observation_time, metar.wind_speed_kt, metar.flight_category, metar.raw_text, elev, metar.visibility_statute_mi, metar.cloud_base_ft_agl
+# FROM apt_rwy
+# JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
+# FULL JOIN metar ON (RIGHT(metar.station_id, LENGTH(metar.station_id) - 1)) = apt_base.arpt_id
+# WHERE facility_use_code='PU' AND site_type_code='A' AND arpt_status='O' AND
+# CASE
+# 	WHEN metar.station_id IS NOT NULL
+# 	THEN (@(lat_decimal - metar.latitude) <1) AND (@(long_decimal - metar.longitude) <1) AND site_type_code='A'
 	
-	WHEN metar.station_id IS NULL
-	THEN site_type_code='A'
-END
-"""
+# 	WHEN metar.station_id IS NULL
+# 	THEN site_type_code='A'
+# END
+# """
 
-engine=create_engine(db_url)
-with engine.begin() as conn:
-    results=conn.execute(
-        text(query)
-    )
+# engine=create_engine(db_url)
+# with engine.begin() as conn:
+#     results=conn.execute(
+#         text(query)
+#     )
 
-arpt_weather_query_df = pd.DataFrame(results)
+# arpt_weather_query_df = pd.DataFrame(results)
 
-# Save the df as a CSV file. Might not be needed if we only use JSON    TO BE REMOVED?
-# arpt_weather_query_df.to_csv (r'airport_weather_data.csv', index = False) # place 'r' before the path name
+# # Save the df as a CSV file. Might not be needed if we only use JSON    TO BE REMOVED?
+# # arpt_weather_query_df.to_csv (r'airport_weather_data.csv', index = False) # place 'r' before the path name
 
 
-# convert the dataframe to a dictionary then to a JSON string
-arpt_weather_string=json.dumps(list(arpt_weather_query_df.T.to_dict().values()))
+# # convert the dataframe to a dictionary then to a JSON string
+# arpt_weather_string=json.dumps(list(arpt_weather_query_df.T.to_dict().values()))
 
-# open the file in write mode
-output_path = os.path.join("", "airport_weather_data.json")
-with open(output_path, "w") as file:
-    # write the JSON string to the file
-    file.write(arpt_weather_string.replace("NaN","null"))
+# # open the file in write mode
+# output_path = os.path.join("", "airport_weather_data.json")
+# with open(output_path, "w") as file:
+#     # write the JSON string to the file
+#     file.write(arpt_weather_string.replace("NaN","null"))
 
-# file is automatically closed after the with block
+# # file is automatically closed after the with block
 
 
 
@@ -257,50 +257,50 @@ with open(output_path, "w") as file:
 # file is automatically closed after the with block
 
 # %% [markdown]
-# __To download headwing and crosswind informations for all runways__
+# __To download headwing and crosswind informations for all runways__ (Not used anymore: to be deleted)
 
 # %%
-# download the output of a query across multiple tables with the wind information relative to all runways.
-# Will be used to update the makers for all airports.
-# There are multiple rows per airport (one per runway).
-# More parameters can be added to complete the info on the popup window.
+# # download the output of a query across multiple tables with the wind information relative to all runways.
+# # Will be used to update the makers for all airports.
+# # There are multiple rows per airport (one per runway).
+# # More parameters can be added to complete the info on the popup window.
 
-load_dotenv()
-db_url = os.environ.get("link_render")
-
-
-query="""
-SELECT arpt_id, icao_id, arpt_name, apt_rwy.rwy_id, apt_rwy.rwy_len, apt_rwy_end.rwy_end_id, apt_rwy_end.true_alignment, metar.wind_dir_degrees, metar.wind_speed_kt, metar.wind_gust_kt,
-ROUND(metar.wind_speed_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "cross_wind",
-ROUND(metar.wind_speed_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "head_wind",
-ROUND(metar.wind_gust_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_cross_wind",
-ROUND(metar.wind_gust_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_head_wind"	
-FROM apt_rwy
-JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
-JOIN apt_rwy_end ON apt_base.site_no = apt_rwy_end.site_no AND apt_rwy.rwy_id = apt_rwy_end.rwy_id
-FULL JOIN metar ON (RIGHT(metar.station_id, LENGTH(metar.station_id) - 1)) = apt_base.arpt_id
-WHERE facility_use_code='PU' AND arpt_status='O' AND site_type_code='A' AND (@(lat_decimal - metar.latitude) <1) AND (@(long_decimal - metar.longitude) <1) AND metar.wind_dir_degrees != 'VRB'
-"""
-
-engine=create_engine(db_url)
-with engine.begin() as conn:
-    results=conn.execute(
-        text(query)
-    )
-
-rwy_wind_query_df = pd.DataFrame(results)
+# load_dotenv()
+# db_url = os.environ.get("link_render")
 
 
-# convert the dataframe to a dictionary then to a JSON string
-rwy_wind_string=json.dumps(list(rwy_wind_query_df.T.to_dict().values()))
+# query="""
+# SELECT arpt_id, icao_id, arpt_name, apt_rwy.rwy_id, apt_rwy.rwy_len, apt_rwy_end.rwy_end_id, apt_rwy_end.true_alignment, metar.wind_dir_degrees, metar.wind_speed_kt, metar.wind_gust_kt,
+# ROUND(metar.wind_speed_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "cross_wind",
+# ROUND(metar.wind_speed_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "head_wind",
+# ROUND(metar.wind_gust_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_cross_wind",
+# ROUND(metar.wind_gust_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_head_wind"	
+# FROM apt_rwy
+# JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
+# JOIN apt_rwy_end ON apt_base.site_no = apt_rwy_end.site_no AND apt_rwy.rwy_id = apt_rwy_end.rwy_id
+# FULL JOIN metar ON (RIGHT(metar.station_id, LENGTH(metar.station_id) - 1)) = apt_base.arpt_id
+# WHERE facility_use_code='PU' AND arpt_status='O' AND site_type_code='A' AND (@(lat_decimal - metar.latitude) <1) AND (@(long_decimal - metar.longitude) <1) AND metar.wind_dir_degrees != 'VRB'
+# """
 
-# open the file in write mode
-output_path = os.path.join("", "rwy_wind_data.json")
-with open(output_path, "w") as file:
-    # write the JSON string to the file
-    file.write(rwy_wind_string.replace("NaN","null"))
+# engine=create_engine(db_url)
+# with engine.begin() as conn:
+#     results=conn.execute(
+#         text(query)
+#     )
 
-# file is automatically closed after the with block
+# rwy_wind_query_df = pd.DataFrame(results)
+
+
+# # convert the dataframe to a dictionary then to a JSON string
+# rwy_wind_string=json.dumps(list(rwy_wind_query_df.T.to_dict().values()))
+
+# # open the file in write mode
+# output_path = os.path.join("", "rwy_wind_data.json")
+# with open(output_path, "w") as file:
+#     # write the JSON string to the file
+#     file.write(rwy_wind_string.replace("NaN","null"))
+
+# # file is automatically closed after the with block
 
 # %%
 # rwy_wind_query_df.head()
@@ -313,6 +313,9 @@ with open(output_path, "w") as file:
 
 # %%
 
+
+# %% [markdown]
+# __Retrieve all data to position the circles for all airports and create the popup text__
 
 # %%
 # download the output of a consolidated query across multiple tables with all information pertinent to an airport.
@@ -343,10 +346,14 @@ CASE
 	THEN site_type_code='A'
 END;
 
+-- SELECT * FROM all_rwy_xwind_view;
+
+
+
 -- Query to get wind information for each runway as a VIEW
 DROP VIEW IF EXISTS all_rwy_xwind_view;
 CREATE VIEW all_rwy_xwind_view AS
-SELECT arpt_id, icao_id, arpt_name, apt_rwy.rwy_id, apt_rwy.rwy_len, apt_rwy_end.rwy_end_id, apt_rwy_end.true_alignment, metar.wind_dir_degrees, metar.wind_speed_kt, metar.wind_gust_kt,
+SELECT arpt_id, icao_id, arpt_name, apt_base.tpa, apt_rwy.rwy_id, apt_rwy.rwy_len, apt_rwy_end.rwy_end_id, apt_rwy_end.true_alignment, apt_rwy_end.right_hand_traffic_pat_flag, metar.wind_dir_degrees, metar.wind_speed_kt, metar.wind_gust_kt,
 	ROUND(metar.wind_speed_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "cross_wind",
 	ROUND(metar.wind_speed_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "head_wind",
 	ROUND(metar.wind_gust_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_cross_wind",
@@ -365,9 +372,10 @@ CASE -- by not have the CASE, we were not providing the rwy length of the airpor
 	THEN site_type_code='A'
 END;
 
+
 -- Merge the two VIEWS
-SELECT 	all_circles_view.arpt_id, all_circles_view.icao_id, all_circles_view.station_id, all_circles_view.arpt_name, all_circles_view.lat_decimal, all_circles_view.long_decimal, all_circles_view.elev, 
-		all_circles_view.rwy_id, all_rwy_xwind_view.rwy_end_id, all_rwy_xwind_view.rwy_len,
+SELECT 	all_circles_view.arpt_id, all_circles_view.icao_id, all_circles_view.station_id, all_circles_view.arpt_name, all_circles_view.lat_decimal, all_circles_view.long_decimal, all_circles_view.elev, all_rwy_xwind_view.tpa,
+		all_circles_view.rwy_id, all_rwy_xwind_view.rwy_end_id, all_rwy_xwind_view.rwy_len, all_rwy_xwind_view.right_hand_traffic_pat_flag,
 		all_rwy_xwind_view.cross_wind, all_rwy_xwind_view.head_wind, all_rwy_xwind_view.gust_cross_wind, all_rwy_xwind_view.gust_head_wind,		
 		all_rwy_xwind_view.true_alignment,
 		all_rwy_xwind_view.wind_dir_degrees, all_rwy_xwind_view.wind_speed_kt, all_rwy_xwind_view.wind_gust_kt,
@@ -404,20 +412,20 @@ airport_info_query_raw_df = pd.DataFrame(results)
 airport_info_query_raw_df.head()
 
 # %%
-# airport_info_query_df.columns
+# airport_info_query_raw_df.columns
 
 # %%
 # Consolidation of the database with only one row per airport regardless of the number of runways
 
 airport_info_query_df=pd.DataFrame(columns=['arpt_id', 'icao_id', 'station_id', 'arpt_name', 'lat_decimal',
-       'long_decimal', 'elev', 'rwy_id', 'rwy_end_id', 'rwy_len', 'cross_wind',
-       'head_wind', 'gust_cross_wind', 'gust_head_wind', 'true_alignment',
+       'long_decimal', 'elev', 'tpa', 'rwy_id', 'rwy_end_id', 'rwy_len',
+       'right_hand_traffic_pat_flag', 'cross_wind', 'head_wind',
+       'gust_cross_wind', 'gust_head_wind', 'true_alignment',
        'wind_dir_degrees', 'wind_speed_kt', 'wind_gust_kt', 'flight_category',
        'visibility_statute_mi', 'cloud_base_ft_agl', 'observation_time',
        'raw_text'])
 
 airport_info_query_df["popup_text"]=np.nan
-# airport_info_query_df.loc[airport_info_query_raw_df.index[0]] = airport_info_query_raw_df.iloc[0]
 
 first_row=True
 first_rwy=True
@@ -436,6 +444,12 @@ for i in range (a):
        popup_text=popup_text+'<br>'+"""<div class="arpt_name"> """+airport_info_query_raw_df.iloc[i]["arpt_name"]+'</div>'
        popup_text=popup_text+'<br>'+"""<div class="elev">Airport Elevation: """+str(int(airport_info_query_raw_df.iloc[i]["elev"]))+""" (ft MSL)</div>"""
 
+       if pd.isna(airport_info_query_raw_df.iloc[i]["tpa"])==False:
+           popup_text=popup_text+'<br>'+"""<div class="tpa">TPA: """+str(int(airport_info_query_raw_df.iloc[i]["elev"]+int(airport_info_query_raw_df.iloc[i]["tpa"])))+""" (ft MSL)</div>"""
+       else:
+           popup_text=popup_text+'<br>'+"""<div class="tpa">TPA (estimated): """+str(int(airport_info_query_raw_df.iloc[i]["elev"]+1000))+""" (ft MSL)</div>"""
+             
+
        if pd.isna(airport_info_query_raw_df.iloc[i]["visibility_statute_mi"])==False:
            popup_text=popup_text+'<br>'+"""<div class="visibility_statute_mi">Airport visibility: """+airport_info_query_raw_df.iloc[i]["visibility_statute_mi"]+' (SM)</div>'
 
@@ -453,6 +467,9 @@ for i in range (a):
     if pd.isna(airport_info_query_raw_df.iloc[i]["raw_text"])==False:
         if pd.isna(airport_info_query_raw_df.iloc[i]["rwy_end_id"])==False:
             popup_text=popup_text+'<br>'+"""<div class="rwy_end_id"> """+airport_info_query_raw_df.iloc[i]["rwy_end_id"]+' :</div>'
+            if airport_info_query_raw_df.iloc[i]["right_hand_traffic_pat_flag"]=='Y':
+                popup_text=popup_text+'<br>'+"""<div class="RP"> RP </div>"""
+
 
         if pd.isna(airport_info_query_raw_df.iloc[i]["cross_wind"])==False:
             popup_text=popup_text+'<br>'+"""<div class="cross_wind">Crosswind (neg. is from right): """+str(int(airport_info_query_raw_df.iloc[i]["cross_wind"]))+' (kt)</div>'
@@ -502,7 +519,7 @@ with open(output_path, "w") as file:
         
 
 
-airport_info_query_df
+# airport_info_query_df
 
 
 
