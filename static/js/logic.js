@@ -2,7 +2,7 @@
 // To recenter the map on the airport entered in the submit field
 function submitForm() {
   // console.log(airport.value);
-  d3.json("../airport_info_full_data.json").then(metarInfo => {
+  d3.json("airport_info_full_data.json").then(metarInfo => {
 
     let arpt_coord = [];
     for (let i = 0; i < metarInfo.length; i++) {
@@ -109,7 +109,7 @@ control_layer.addTo(myMap);
 // Addition of the airport makers from the fully populated json file
 
 // Pull the "flight_category property from response.data.
-d3.json("../airport_info_full_data.json").then(airport_json => {
+d3.json("airport_info_full_data.json").then(airport_json => {
 
   // Initialize an array to hold the airport circles.
   let metarMarkers = [];
@@ -176,7 +176,7 @@ d3.json("../airport_info_full_data.json").then(airport_json => {
 //******************************************************************
 // Add airmet and sigmet polygones
 
-d3.json("../airsigmet_data.json").then(airport_json => {
+d3.json("airsigmet_data.json").then(airport_json => {
 
   var sigConv = [];
   var sigTurb = []
