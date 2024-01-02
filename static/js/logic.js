@@ -2,16 +2,16 @@
 // To recenter the map on the airport entered in the submit field
 function submitForm() {
   // console.log(airport.value);
-  d3.json("airport_weather_data.json").then(metarInfo => {
+  d3.json("airport_info_full_data.json").then(metarInfo => {
 
     let arpt_coord = [];
     for (let i = 0; i < metarInfo.length; i++) {
       // console.log(metarInfo[i].arpt_id);  // To be removed
       if ((metarInfo[i].arpt_id == airport.value.toUpperCase()) || (metarInfo[i].icao_id == airport.value.toUpperCase())) {
-        console.log(metarInfo[i].arpt_id == airport.value.toUpperCase());
-        console.log(metarInfo[i].icao_id == airport.value.toUpperCase());
+        // console.log(metarInfo[i].arpt_id == airport.value.toUpperCase());  // To be removed
+        // console.log(metarInfo[i].icao_id == airport.value.toUpperCase());  // To be removed
         arpt_coord.push(metarInfo[i].lat_decimal, metarInfo[i].long_decimal);
-        console.log(arpt_coord)
+        // console.log(arpt_coord)  // To be removed
         break
       }
     };
