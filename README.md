@@ -10,30 +10,33 @@ The goal of this application is to provide a visual interpretation of the flight
 
 
 ## Features ##
-The application displays by default a __METAR layer__ containing color-coded circles for about 4,880 airports in the US. The layer can be toggled on and off. The color coding follows a FAA standard and therefore does not need a legend:
-<ul>Green: Visual Flight Rule (VFR) when the cloud ceiling is greater than 3,000 feet and the visibility greater than 5 statute miles</ul>
-<ul>Blue: Marginal Visual Flight Rule (MVFR) when the cloud ceiling is 1,000 feet to 3,000 feet and/or the visibility 3 to 5 miles inclusive</ul>
-<ul>RED: Instrument Flight Rule (IFR) when the cloud ceiling is 500 feet to less than 1,000 feet and/or the visibility 1 to less than 5 statute miles</ul>
-<ul>Purple: Low Instrument Flight Rule (LIFR) when the cloud ceiling is less than 500 feet and/or the visibility less than 1 statute miles</ul>
-<ul>Grey: When no weather information is available</ul>
+The application (https://ga-weather-mapping.onrender.com/) displays by default a __METAR layer__ containing color-coded circles for about 4,880 airports in the US. The layer can be toggled on and off. The color coding follows a FAA standard and therefore does not need a legend:
+- Green: Visual Flight Rule (VFR) when the cloud ceiling is greater than 3,000 feet and the visibility greater than 5 statute miles
+- Blue: Marginal Visual Flight Rule (MVFR) when the cloud ceiling is 1,000 feet to 3,000 feet and/or the visibility 3 to 5 miles inclusive
+- RED: Instrument Flight Rule (IFR) when the cloud ceiling is 500 feet to less than 1,000 feet and/or the visibility 1 to less than 5 statute miles
+- Purple: Low Instrument Flight Rule (LIFR) when the cloud ceiling is less than 500 feet and/or the visibility less than 1 statute miles
+- Grey: When no weather information is available
 Clicking on a circle will open a popup window containing dynamically populated information relative to the airport:
-<ul> airport code</ul>
-<ul> airport ICAO code </ul>
-<ul> airport name </ul>
-<ul> airport elevation </ul>
-<ul> traffic pattern altitude (TPS) when available, and calculated (estimated) when not provided </ul>
-<ul> airport visibility when available </ul>
-<ul> airport ceiling when available </ul>
-<ul> airport runway orientation </ul>
-<ul> airport runway length when available</ul>
-<ul> airport runway width when available</ul>
-<ul> dynamically calculated crosswind and headwind for each runway direction when weather information is available</ul>
-<ul> a "Right Pattern" flag (RP) when the approach pattern to a specific runway is non-standard</ul>
-<ul> Raw shorthand weather information in a format familiar to pilots</ul>
-<ul> GMT time when the weather information was collected</ul>
+- airport code
+- airport ICAO code 
+- airport name 
+- airport elevation 
+- traffic pattern altitude (TPS) when available, and calculated (estimated) when not provided 
+- airport visibility when available 
+- airport ceiling when available 
+- airport runway orientation 
+- airport runway length when available
+- airport runway width when available
+- dynamically calculated crosswind and headwind for each runway direction when weather information is available
+- a "Right Pattern" flag (RP) when the approach pattern to a specific runway is non-standard
+- Raw shorthand weather information in a format familiar to pilots
+- GMT time when the weather information was collected
 <br>
 By entering the airport codes in input field located in the top left corner, the user will jump directly to the airport location on the map. Both the airport code and the ICAO code are accepted, for example SFO or KSFO for San Francisco Intl., LAX or KLAX for Los Angeles International, etc.
 <br>
 <br>
 In addition to the individual airport information, the app provides additional layers relative to inflight weather information advisories currently active in the national airspace. They follow the FAA classification for SIGMET (Significant Meteorological Information) and AIRMET (AIRman's METeorological Information) corresponding to specific flight risks. Clicking on the polygons will open a popup window with the raw shorthand information describing the boundaries of the polygons and some additional weather-related details. They also include the time window when the advisory is valid.<br>
+
+## Design ##
+The information about the airport comes from the FAA website (https://www.faa.gov/air_traffic/flight_info/aeronav/Aero_Data/NASR_Subscription/ ). It is valid for 28 days.
 
