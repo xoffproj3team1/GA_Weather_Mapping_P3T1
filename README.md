@@ -7,14 +7,15 @@ Christophe V., Immanuel O., Vanessa V., Max O., Thanos C.
 While commercial aviation is one of the safest method of transportation, the General Aviation (GA) community is still plagued with a much higher rate of accidents and casualties.<br>
 Many reasons can explain these statistics: while commercial flights are crewed by a team of highly trained professional pilots with stringent currency requirements flying modern computer-operated aircrafts maintained by specialized mechanics under the supervision of governamental agencies, the GA planes are in average 47 years old (in the US) with very few safeguards and are operated by single pilots whose proficiency and recent experience might lag over time. Most of the General Aviation accidents are caused by pilot errors and a significant portion of them are linked to encounters with bad weather that exceed the capabilities of the pilot and the plane. For example, flying into a cloud can cause spatial disorientation for pilots not instrument-rated leading to a loss of control in less that 3 minutes (University of Illinois study - 1954). Lack of visibility is also the main cause for flying an aircraft into terrain. The deposition of ice on the airfoils degrades the lift dramatically to the point where a stall occurs, and a turbulence that would be a mere bump in a jumbo jet can flip a GA airplane and exceed its structural resistance. It is the reason why the FAA puts a lot of emphasis on weather avoidance during pilot training, but accessing and analysing the relevant weather information in preparation for a flight can be challenging.<br>
 The goal of this application is to provide a visual interpretation of the flight conditions to be expected for the pilot to decide if they are safe for flying based on the plane capabilities and on the pilot personal minima (minimum weather he or she is comfortable to fly into).<br>
-As best summarized by an old aviation saying: “It’s better to be on the ground wishing you were in the air than in the air wishing you were on the ground.”
+As best summarized by an old aviation saying: “<i>It’s better to be on the ground wishing you were in the air than in the air wishing you were on the ground.</i>”
 
 
 ## Features ##
 The application (https://ga-weather-mapping.onrender.com/) displays by default a __METAR layer__ containing color-coded circles for about 4,880 airports in the US.<br>
 <br><br>
-
-<br><br>
+<img width="576" alt="Webpage_landing" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/a6137341-4306-42fa-9f75-a9a885cfcd0b">
+<br> <i> Website landing page </i>
+<br>
 
 The layer can be toggled on and off. The color coding follows a FAA standard and therefore does not need a legend:
 - Green: Visual Flight Rule (VFR) when the cloud ceiling is greater than 3,000 feet and the visibility greater than 5 statute miles
@@ -24,7 +25,7 @@ The layer can be toggled on and off. The color coding follows a FAA standard and
 - Grey: When no weather information is available
 <br><br>
 <img width="444" alt="METAR_color_coding" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/44120383-a8af-4074-ae11-ac8827f6b6c0">
-
+<br> <i> View of the airports in the San Francisco Bay Area </i>
 <br><br>
 Clicking on a circle will open a popup window containing dynamically populated information relative to the airport:
 - airport code
@@ -44,18 +45,24 @@ Clicking on a circle will open a popup window containing dynamically populated i
 - GMT time when the weather information was collected
 <br><br>
 <img width="411" alt="SJC_weather_info" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/2b7878ac-e7af-4603-a24d-d979fb52b133">
-
+<br> <i> Airport details and current weather conditions at the San Jose, CA airport </i>
 <br><br>
 By entering the airport codes in input field located in the top left corner, the user will jump directly to the airport location on the map. Both the airport code and the ICAO code are accepted, for example SFO or KSFO for San Francisco Intl., LAX or KLAX for Los Angeles International, etc.
 <br><br>
 <img width="347" alt="user_entry" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/f8e8a974-c0d5-4ea7-ae6f-ab6b64f133c2">
+<br> <i> Input field to jump directly to the airport of choice </i>
 
 <br><br>
-In addition to the individual airport information, the app provides additional layers relative to inflight weather information advisories currently active in the national airspace. They follow the FAA classification for SIGMET (Significant Meteorological Information) and AIRMET (AIRman's METeorological Information) corresponding to specific flight risks. Clicking on the polygons will open a popup window with the raw shorthand information describing the boundaries of the polygons and some additional weather-related details. They also include the time window when the advisory is valid.<br>
+In addition to the individual airport information, the app provides additional layers relative to inflight weather information advisories currently active in the national airspace.
+<br><br>
+<img width="576" alt="icing_airmet" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/e12aedfa-0aa0-4c27-9c59-c61e22bb799b">
+<br> <i> Example of an AIRMET advisory about icing </i>
+<br><br>
+They follow the FAA classification for SIGMET (Significant Meteorological Information) and AIRMET (AIRman's METeorological Information) corresponding to specific flight risks. Clicking on the polygons will open a popup window with the raw shorthand information describing the boundaries of the polygons and some additional weather-related details. They also include the time window when the advisory is valid.<br>
 <br><br>
 
 <img width="1639" alt="icing_popup" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/c1f08b9a-1e2a-4ed9-8394-92b8f34fae47">
-
+<br> <i> Additional details regading a specific sector at risk of icing </i>
 <br><br>
 
 ## Design ##
@@ -68,7 +75,7 @@ The information about the airport comes from the FAA website (https://www.faa.go
 We are going to use 5 of the CSV files to populate 5 tables in a PostgreSQL databased hosted on Render.
 <br><br>
 ![airport_db_schema](https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/3310e43f-6b7d-4082-a28c-dbf7024541d3)
-
+<br> <i> ERD for the airport-related tables and for the weather information table (METAR) </i>
 <br><br>
 This database can remain untouched for 28 days until the next cycle is made available. At this stage of the project, the CSV files are loaded manually to their corresponding table on pgAdmin 4: The permanence of the data  in the context of the complication of having the CSV files compressed, stored in a folder, and compressed again, didn't justify the prioritization of an automated retrieval process.<br>
 
@@ -77,7 +84,7 @@ This database can remain untouched for 28 days until the next cycle is made avai
 The weather data comes from the Aviation Weather Center (https://aviationweather.gov/data/api/#/ ). Instead of polling the data for each each individual airport or SIGMET/AIRMET, we chose to coolect the data for all airports at once. The Metar data (METeorological Aviation Routine Weather Report) is typically issued 5 minutes before each hour and is considered to be valid for one hour. The cache files for the METARs and SIGMET/AIRMET are nonetheless updated every minute.
 <br>
 <br><img width="746" alt="AWC_APIs" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/73943e3d-113f-439f-9687-6513c1da7843">
-
+<br> <i> AWC APIs </i>
 
 <br><br>
 The __weather_download.py__ file takes care of:
