@@ -11,12 +11,21 @@ As best summarized by an old aviation saying: “It’s better to be on the grou
 
 
 ## Features ##
-The application (https://ga-weather-mapping.onrender.com/) displays by default a __METAR layer__ containing color-coded circles for about 4,880 airports in the US. The layer can be toggled on and off. The color coding follows a FAA standard and therefore does not need a legend:
+The application (https://ga-weather-mapping.onrender.com/) displays by default a __METAR layer__ containing color-coded circles for about 4,880 airports in the US.<br>
+<br><br>
+
+<br><br>
+
+The layer can be toggled on and off. The color coding follows a FAA standard and therefore does not need a legend:
 - Green: Visual Flight Rule (VFR) when the cloud ceiling is greater than 3,000 feet and the visibility greater than 5 statute miles
 - Blue: Marginal Visual Flight Rule (MVFR) when the cloud ceiling is 1,000 feet to 3,000 feet and/or the visibility 3 to 5 miles inclusive
 - RED: Instrument Flight Rule (IFR) when the cloud ceiling is 500 feet to less than 1,000 feet and/or the visibility 1 to less than 5 statute miles
 - Purple: Low Instrument Flight Rule (LIFR) when the cloud ceiling is less than 500 feet and/or the visibility less than 1 statute miles
 - Grey: When no weather information is available
+<br><br>
+<img width="444" alt="METAR_color_coding" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/44120383-a8af-4074-ae11-ac8827f6b6c0">
+
+<br><br>
 Clicking on a circle will open a popup window containing dynamically populated information relative to the airport:
 - airport code
 - airport ICAO code 
@@ -33,20 +42,47 @@ Clicking on a circle will open a popup window containing dynamically populated i
 - a "Right Pattern" flag (RP) when the approach pattern to a specific runway is non-standard
 - Raw shorthand weather information in a format familiar to pilots
 - GMT time when the weather information was collected
-<br>
+<br><br>
+<img width="411" alt="SJC_weather_info" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/2b7878ac-e7af-4603-a24d-d979fb52b133">
+
+<br><br>
 By entering the airport codes in input field located in the top left corner, the user will jump directly to the airport location on the map. Both the airport code and the ICAO code are accepted, for example SFO or KSFO for San Francisco Intl., LAX or KLAX for Los Angeles International, etc.
-<br>
-<br>
+<br><br>
+<img width="347" alt="user_entry" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/f8e8a974-c0d5-4ea7-ae6f-ab6b64f133c2">
+
+<br><br>
 In addition to the individual airport information, the app provides additional layers relative to inflight weather information advisories currently active in the national airspace. They follow the FAA classification for SIGMET (Significant Meteorological Information) and AIRMET (AIRman's METeorological Information) corresponding to specific flight risks. Clicking on the polygons will open a popup window with the raw shorthand information describing the boundaries of the polygons and some additional weather-related details. They also include the time window when the advisory is valid.<br>
+<br><br>
+
+<img width="1639" alt="icing_popup" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/c1f08b9a-1e2a-4ed9-8394-92b8f34fae47">
+
+<br><br>
 
 ## Design ##
-The information about the airport comes from the FAA website (https://www.faa.gov/air_traffic/flight_info/aeronav/Aero_Data/NASR_Subscription/ ). It is valid for 28 days. It is a zip file containing 22 text files and 4 folders. One of the folder contains another zip file containing a collection of 104 PDF or CSV files. We are going to use 7 of the CSV files to populate 7 tables in a PostgreSQL databased hosted on Render. This database can remain untouched for 28 days until the next cycle is made available. At this stage of the project, the CSV files are loaded manually to their corresponding table on pgAdmin 4: The permanence of the data  in the context of the complication of having the CSV files compressed, stored in a folder, and compressed again, didn't justify the prioritization of an automated retrieval process.<br>
+The information about the airport comes from the FAA website (https://www.faa.gov/air_traffic/flight_info/aeronav/Aero_Data/NASR_Subscription/ ). It is valid for 28 days. It is a zip file containing 22 text files and 4 folders. One of the folder contains another zip file containing a collection of 104 PDF or CSV files. 
+<br><br>
+<img width="586" alt="FAA_28_Day_NASR_Subscription" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/c73906f8-a257-481a-9ff0-f1ff0d318f01">
+<br><br>
+<img width="586" alt="FAA_28_Day_NASR_Subscription_content" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/0cd237f8-48b8-4e2a-8b7b-8a4fa1f1c1a8">
+<br><br>
+We are going to use 5 of the CSV files to populate 5 tables in a PostgreSQL databased hosted on Render.
+<br><br>
+![airport_db_schema](https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/3310e43f-6b7d-4082-a28c-dbf7024541d3)
+
+<br><br>
+This database can remain untouched for 28 days until the next cycle is made available. At this stage of the project, the CSV files are loaded manually to their corresponding table on pgAdmin 4: The permanence of the data  in the context of the complication of having the CSV files compressed, stored in a folder, and compressed again, didn't justify the prioritization of an automated retrieval process.<br>
+
+
 <br>
 The weather data comes from the Aviation Weather Center (https://aviationweather.gov/data/api/#/ ). Instead of polling the data for each each individual airport or SIGMET/AIRMET, we chose to coolect the data for all airports at once. The Metar data (METeorological Aviation Routine Weather Report) is typically issued 5 minutes before each hour and is considered to be valid for one hour. The cache files for the METARs and SIGMET/AIRMET are nonetheless updated every minute.
 <br>
+<br><img width="746" alt="AWC_APIs" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/73943e3d-113f-439f-9687-6513c1da7843">
+
+
+<br><br>
 The __weather_download.py__ file takes care of:
 - Automatically extracting the data from the airsigmets.cache.csv.gz, transforming the data, and saving it as a json file that can be read by Leaflet.js with all the granularity required. The information obtained is independant of the airport database and does not justify to be added to a database table.
-- Automatically extracting the weather information from the metars.cache.csv.gz file, transforming the data and uploading it to a table in the database.
+- Automatically extracting the weather information from the metars.cache.csv.gz file, transforming the data and uploading it to a table in the database. This is the 6th table shown in the ERD view.
 - Running queries on 4 tables to join the weather information with their matching airports, running calculations about crosswind and headwind for each runway, and filtering out the airports not available to the public (military, private, closed) as well as the heliports. The airports in the FAA and AWC databases are only partially overlapping and are using inconsistent identifications, which requires additional verifications to avoid misattributions.
 - Using Pandas to consolidate about 13.330 rows (one per runway direction) into about 4,880 distinct airports while keeping all the information, and saving the resulting database in a json file that Leaflet.js can use to display on the map all the airport circles with their appropriate color without visible delay.
 <br><br>
