@@ -208,8 +208,7 @@ airsigmet_data_df.head()
 
 # %%
 # replace with <br> in raw_text
-# airsigmet_data_df['raw_text'].str.replace(r' \x07','<br>')
-# airsigmet_data_df.replace(r' x07','<br>', regex=True)
+airsigmet_data_df["raw_text"] = airsigmet_data_df["raw_text"].replace(r'\x07','<br>', regex=True)   # Used to replace \n that does not get decompressed as utf-8 and was converted as \x07
 
 # To convert the points delimiting the areas into something Leaflet-friendly
 for j in range(len(airsigmet_data_df)):
