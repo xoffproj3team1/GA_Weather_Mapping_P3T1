@@ -59,7 +59,7 @@ The __logic.js__ file has four functions:
 The __style.css__ file takes care, amongst other things, of the formating of the information in the popup text for the airports.
 <br><br>
 The application (code and database) run on server managed by Render. The Start Command on the Web Service points to a file called __app.py__ (gunicorn app:app), that uses Flask to point to the __index.html__ file.<br>
-A PostgreSQL database was chosen because it is natively supported by Render
+A PostgreSQL database was chosen because it is natively supported by Render, and the testing of the queries is made easy by pgAdmin 4.
 
 
 ## Ethical Considerations ##
@@ -67,5 +67,29 @@ The data used is not licensed and is freely provided to the public by the US Gov
 
 
 ## Meeting Requirements ##
+All the requirements listed in the project are met:
+- The dataset contains at least 100 unique records.
+  - One of the tables has about 20,000 records. The multi-table query outputs about 13,330 rows that are later displayed as about 4880 unique recors.
+- The data is stored in a PostgreSQL database.
+- Extensive README file with all relevant details including user instructions.
+- Origine and sensitivity of the data is discussed.
+- A minimum of three unique views present the data:
+  - Layer with about 4,880 airports placed on the map with the corresponding visibility and ceiling information, in addition to several base map providing unique information about the environment of the airports.
+  - Popups window specific to an airport with additional information about its runways and about the wind components to expect for each of them.
+  - Layers with SIGMET and AIRMET information relevant to flight planning.
+- The visualization follows FAA standards and is easy to interpret by any certified or student pilot.
+- Additional libraries are leveraged by the code such as __psycopg2__, __gunicorn__, and __dotenv__.
+- Leveraging of Leaflet LayerControl to add HTML menus
+- Addition of an HTML input box used to move the map to a specific airport.
+- Full ETL workflow with automated renewal of the METAR table.
+- The Database has 8 tables (only 4 are currently used for the existing features)
+- The choice of using PostgreSQL is documented.
+- The ERD is in the README.
+- Flask is used by the Web Service to identify the index.html file.
+
+In addition:
+- Full stack application supported on a commercial server.
+- Code designed for scalability (addition of new features)
+- Code designed to be light on the client 
 
 
