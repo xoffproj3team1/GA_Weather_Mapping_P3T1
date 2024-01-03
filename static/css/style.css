@@ -166,10 +166,21 @@ html {
   /* padding-bottom: 0px */
 }
 
-/* .rwy_end_id{
-  font-weight: bold;
-} */
+.gust_cross_wind{
+  padding-inline-start: 40px;
+  margin-top: -10px;
+  padding-top: 0px;
+  margin-bottom: -5px;
+  padding-bottom: 0px;
+}
 
+.gust_head_wind{
+  padding-inline-start: 40px;
+  margin-top: -10px;
+  padding-top: 0px;
+  margin-bottom: -5px;
+  /* padding-bottom: 0px */
+}
 
 
 .raw_text{
