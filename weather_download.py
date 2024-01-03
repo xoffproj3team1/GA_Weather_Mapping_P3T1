@@ -30,15 +30,43 @@ metar_data_df = pd.read_csv(url_metar_gz, header=5, compression='gzip')
 metar_data_df.head()
 
 # %%
+# Convert the dataframe to a JSON format
+# metar_json = json.loads(json.dumps(list(metar_data_df.T.to_dict().values())))   # https://stackoverflow.com/questions/39257147/convert-pandas-dataframe-to-json-format answer #10 Amir.S
+# pprint(metar_json, sort_dicts=False)  # the pprint process is slow (10.5sec)
+
+# %%
+# pprint(metar_json, sort_dicts=False)
+
+# %%
+# Convert some columns to INT
+# cols=['wind_dir_degrees','wind_speed_kt','wind_gust_kt','cloud_base_ft_agl','cloud_base_ft_agl.2',\
+#     'cloud_base_ft_agl.3','vert_vis_ft','elevation_m']
+# metar_data_df[cols]=metar_data_df[cols].apply(pd.to_numeric, errors='coerce', downcast='integer', axis=1) # Does not appear to convert to INT, but to FLOAT64
+# metar_data_df[cols]=metar_data_df[cols].astype(int)   # Cannot convert NaN
+
+# %%
+# metar_data_df.columns
+
+# %%
+# metar_data_df.info()
+
+# %%
 # convert the dataframe to a dictionary then to a JSON string
 metar_string=json.dumps(list(metar_data_df.T.to_dict().values()))
 
 # open the file in write mode
 # output_path = os.path.join("Resources", "metar_data.json")  # To be removed if logic.js cannot read from Resources
-output_path = os.path.join("", "metar_data.json")
+output_path = os.path.join("static", "metar_data.json")
 with open(output_path, "w") as file:
     # write the JSON string to the file
     file.write(metar_string.replace("NaN","null"))
+
+# file is automatically closed after the with block
+
+# %%
+# To save the dataframe as a csv file for future import to database (not needed anymore)
+# output_path2 = os.path.join("", "metar_data.csv")
+# metar_data_df.to_csv(output_path2, index=False)
 
 # file is automatically closed after the with block
 
@@ -66,7 +94,7 @@ cursor = connection.cursor()
 
 cursor.execute("set search_path to public") # https://dba.stackexchange.com/questions/268365/using-python-to-insert-json-into-postgresql
 
-with open('metar_data.json') as file:
+with open(output_path) as file:
     data = file.read()
 
 query_sql = """
@@ -76,6 +104,74 @@ json_populate_recordset(NULL::metar, %s);
 
 cursor.execute(query_sql, (data,))
 connection.commit()
+
+# %% [markdown]
+# __To download a new json file made of the joining of airport data and weather data__ (not used anymore: To be deleted)
+
+# %%
+# # download the output of a query across multiple tables with all the active public airport with or without weather information.
+# # Will be used to populate the makers that do not have METAR information.
+# # There is only one row per airport so only one runway is listed even if the airport as more.
+# # More parameters can be added to complete the info on the popup window.
+
+# load_dotenv()
+# db_url = os.environ.get("link_render")
+
+# # query="""
+# #     SELECT DISTINCT ON (arpt_id)
+# # 	arpt_id, icao_id, metar.station_id, arpt_name, apt_rwy.rwy_id, lat_decimal, long_decimal, metar.observation_time, metar.wind_speed_kt, metar.flight_category, metar.raw_text
+# #     FROM apt_rwy
+# #     JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
+# #     FULL JOIN metar ON metar.station_id = apt_base.icao_id
+# #     WHERE facility_use_code='PU' AND site_type_code='A' AND arpt_status='O';
+# #     """
+
+# query="""
+# SELECT DISTINCT ON (arpt_id)
+#     arpt_id, icao_id, metar.station_id, arpt_name, apt_rwy.rwy_id, lat_decimal, metar.latitude, long_decimal, metar.longitude, metar.observation_time, metar.wind_speed_kt, metar.flight_category, metar.raw_text, elev, metar.visibility_statute_mi, metar.cloud_base_ft_agl
+# FROM apt_rwy
+# JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
+# FULL JOIN metar ON (RIGHT(metar.station_id, LENGTH(metar.station_id) - 1)) = apt_base.arpt_id
+# WHERE facility_use_code='PU' AND site_type_code='A' AND arpt_status='O' AND
+# CASE
+# 	WHEN metar.station_id IS NOT NULL
+# 	THEN (@(lat_decimal - metar.latitude) <1) AND (@(long_decimal - metar.longitude) <1) AND site_type_code='A'
+	
+# 	WHEN metar.station_id IS NULL
+# 	THEN site_type_code='A'
+# END
+# """
+
+# engine=create_engine(db_url)
+# with engine.begin() as conn:
+#     results=conn.execute(
+#         text(query)
+#     )
+
+# arpt_weather_query_df = pd.DataFrame(results)
+
+# # Save the df as a CSV file. Might not be needed if we only use JSON    TO BE REMOVED?
+# # arpt_weather_query_df.to_csv (r'airport_weather_data.csv', index = False) # place 'r' before the path name
+
+
+# # convert the dataframe to a dictionary then to a JSON string
+# arpt_weather_string=json.dumps(list(arpt_weather_query_df.T.to_dict().values()))
+
+# # open the file in write mode
+# output_path = os.path.join("", "airport_weather_data.json")
+# with open(output_path, "w") as file:
+#     # write the JSON string to the file
+#     file.write(arpt_weather_string.replace("NaN","null"))
+
+# # file is automatically closed after the with block
+
+
+
+# %%
+# arpt_weather_query_df.head()
+
+# %%
+# pprint(arpt_weather_string)
 
 # %% [markdown]
 # __To retrieve TAF data__
@@ -111,9 +207,27 @@ airsigmet_data_df = pd.read_csv(url_airsigmets_gz, header=5, compression='gzip',
 airsigmet_data_df.head()
 
 # %%
+# airsigmet_data_df["raw_text"] = airsigmet_data_df["raw_text"].replace(r'\x07','\n', regex=True)
+
+
+# %%
+# airsigmet_data_df["raw_text"] = airsigmet_data_df["raw_text"].replace(r'\x07','<br>', regex=True)   # Used to replace \n that does not get decompressed as utf-8 and was converted as \x07
+
+# %%
+# import re
+# re.findall('[^\w \.-]', airsigmet_data_df['raw_text'][0])
+
+# %%
+# re.sub('[^\w \.-]', "\n", airsigmet_data_df['raw_text'][0])
+
+# %%
+# Fetch, load, and decompress the data relative to Airmet and Sigmet
+# airsigmet_data_df = pd.read_csv(url_airsigmets_gz, header=5, compression='gzip', encoding='utf-8')
+# airsigmet_data_df.head()
+
+# %%
 # replace with <br> in raw_text
-# airsigmet_data_df['raw_text'].str.replace(r' \x07','<br>')
-# airsigmet_data_df.replace(r' x07','<br>', regex=True)
+airsigmet_data_df["raw_text"] = airsigmet_data_df["raw_text"].replace(r'\x07','<br>', regex=True)   # Used to replace \n that does not get decompressed as utf-8 and was converted as \x07
 
 # To convert the points delimiting the areas into something Leaflet-friendly
 for j in range(len(airsigmet_data_df)):
@@ -153,12 +267,70 @@ airsigmet_string=json.dumps(list(airsigmet_data_df.T.to_dict().values()))
 
 # open the file in write mode
 # output_path = os.path.join("Resources", "airsigmet_data.json")
-output_path = os.path.join("", "airsigmet_data.json")
+output_path = os.path.join("static", "airsigmet_data.json")
 with open(output_path, "w") as file:
     # write the JSON string to the file
     file.write(airsigmet_string.replace("NaN","null"))
 
 # file is automatically closed after the with block
+
+# %% [markdown]
+# __To download headwing and crosswind informations for all runways__ (Not used anymore: to be deleted)
+
+# %%
+# # download the output of a query across multiple tables with the wind information relative to all runways.
+# # Will be used to update the makers for all airports.
+# # There are multiple rows per airport (one per runway).
+# # More parameters can be added to complete the info on the popup window.
+
+# load_dotenv()
+# db_url = os.environ.get("link_render")
+
+
+# query="""
+# SELECT arpt_id, icao_id, arpt_name, apt_rwy.rwy_id, apt_rwy.rwy_len, apt_rwy_end.rwy_end_id, apt_rwy_end.true_alignment, metar.wind_dir_degrees, metar.wind_speed_kt, metar.wind_gust_kt,
+# ROUND(metar.wind_speed_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "cross_wind",
+# ROUND(metar.wind_speed_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "head_wind",
+# ROUND(metar.wind_gust_kt*sin(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_cross_wind",
+# ROUND(metar.wind_gust_kt*cos(radians(apt_rwy_end.true_alignment - (metar.wind_dir_degrees :: INTEGER)))) AS "gust_head_wind"	
+# FROM apt_rwy
+# JOIN apt_base ON apt_base.site_no = apt_rwy.site_no
+# JOIN apt_rwy_end ON apt_base.site_no = apt_rwy_end.site_no AND apt_rwy.rwy_id = apt_rwy_end.rwy_id
+# FULL JOIN metar ON (RIGHT(metar.station_id, LENGTH(metar.station_id) - 1)) = apt_base.arpt_id
+# WHERE facility_use_code='PU' AND arpt_status='O' AND site_type_code='A' AND (@(lat_decimal - metar.latitude) <1) AND (@(long_decimal - metar.longitude) <1) AND metar.wind_dir_degrees != 'VRB'
+# """
+
+# engine=create_engine(db_url)
+# with engine.begin() as conn:
+#     results=conn.execute(
+#         text(query)
+#     )
+
+# rwy_wind_query_df = pd.DataFrame(results)
+
+
+# # convert the dataframe to a dictionary then to a JSON string
+# rwy_wind_string=json.dumps(list(rwy_wind_query_df.T.to_dict().values()))
+
+# # open the file in write mode
+# output_path = os.path.join("", "rwy_wind_data.json")
+# with open(output_path, "w") as file:
+#     # write the JSON string to the file
+#     file.write(rwy_wind_string.replace("NaN","null"))
+
+# # file is automatically closed after the with block
+
+# %%
+# rwy_wind_query_df.head()
+
+# %%
+# len(rwy_wind_query_df)
+
+# %%
+# rwy_wind_query_df
+
+# %%
+
 
 # %% [markdown]
 # __Retrieve all data to position the circles for all airports and create the popup text__
@@ -239,6 +411,17 @@ with engine.begin() as conn:
 
 airport_info_query_raw_df = pd.DataFrame(results)
 
+
+# # convert the dataframe to a dictionary then to a JSON string		# The section below will be moved to be used on the consolidated DF.
+# airport_info_string=json.dumps(list(airport_info_query_raw_df.T.to_dict().values()))
+
+# # open the file in write mode
+# output_path = os.path.join("", "airport_info_data.json")
+# with open(output_path, "w") as file:
+#     # write the JSON string to the file
+#     file.write(rwy_wind_string.replace("NaN","null"))
+
+# # file is automatically closed after the with block
 
 # %%
 # airport_info_query_raw_df.head()
@@ -327,6 +510,8 @@ for i in range (a):
                 popup_text=popup_text+'<br> <div class="raw_text">No weather information</div>'
 
             airport_info_query_df.at[k,"popup_text"]=popup_text
+            # print(f"k={k}, i={i}")
+            # print(popup_text)
             first_row=True
             first_rwy=True
         elif airport_info_query_raw_df.iloc[i+1]["rwy_id"]!=airport_info_query_raw_df.iloc[i]["rwy_id"]:
@@ -342,7 +527,7 @@ for i in range (a):
 airport_info_string=json.dumps(list(airport_info_query_df.T.to_dict().values()))
 
 # open the file in write mode
-output_path = os.path.join("", "airport_info_full_data.json")
+output_path = os.path.join("static", "airport_info_full_data.json")
 with open(output_path, "w") as file:
     # write the JSON string to the file
     file.write(airport_info_string.replace("NaN","null"))
@@ -350,8 +535,11 @@ with open(output_path, "w") as file:
 # file is automatically closed after the with block
         
 
-# %%
+
 # airport_info_query_df
+
+
+
 
 # %%
 # airport_info_query_df[airport_info_query_df['arpt_id']=='BLU']
