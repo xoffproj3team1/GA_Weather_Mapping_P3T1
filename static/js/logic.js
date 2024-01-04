@@ -48,17 +48,18 @@ let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
 });
 
 
-let faaSectional = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{-y}.png');
-let faaIFRLow = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/enrl/{z}/{x}/{-y}.png');
+// let faaSectional = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{-y}.png');
+// let faaIFRLow = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/enrl/{z}/{x}/{-y}.png');
 
 
 // Create a baseMaps object to hold the map layers.
 let baseMaps = {
   "Street Map": street,
   "Topo": topo,
-  "Satellite Map": googleSat,
-  "Sectional Map": faaSectional,
-  "IFR Enroute Low Map": faaIFRLow
+  "Satellite Map": googleSat
+  // ,
+  // "Sectional Map": faaSectional,
+  // "IFR Enroute Low Map": faaIFRLow
 };
 
 // Create an overlayMaps object to hold the airport layer and airsigmet layer.
