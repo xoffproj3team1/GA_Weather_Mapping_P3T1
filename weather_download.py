@@ -11,6 +11,9 @@ import csv   # Not used
 import numpy as np
 from pprint import pprint
 import json
+import logging
+import boto3        # AWS SDK for Python
+from botocore.exceptions import ClientError
 
 
 # import gzip    # Not used
@@ -527,5 +530,49 @@ with open(output_path, "w") as file:
 
 # %% [markdown]
 # 
+
+# %% [markdown]
+# __Write the json result files to AWS S3__
+
+# %%
+
+
+
+load_dotenv()
+# key1 = os.environ.get("AWS_ACCESS_KEY_ID")
+# key2 = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
+def upload_file(file_name, bucket, object_name=None):   # Inspired from https://docs.aws.amazon.com/AmazonS3/latest/userguide/example-walkthroughs-managing-access-example1.html
+    """Upload a file to an S3 bucket
+
+    :param file_name: File to upload
+    :param bucket: Bucket to upload to
+    :param object_name: S3 object name. If not specified then file_name is used
+    :return: True if file was uploaded, else False
+    """
+
+    # If S3 object_name was not specified, use file_name
+    if object_name is None:
+        object_name = os.path.basename(file_name)
+
+    # Upload the file
+    s3_client = boto3.client(
+        's3',
+        # aws_access_key_id= os.environ.get("AWS_ACCESS_KEY_ID"),
+        # aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY") )
+        aws_access_key_id= os.environ.get("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key= os.environ.get("AWS_SECRET_ACCESS_KEY"))
+
+    try:
+        response = s3_client.upload_file(file_name, bucket, object_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+
+
+upload_file("static/airsigmet_data.json",'ga-weather', "airsigmet_data.json")
+upload_file("static/airport_info_full_data.json",'ga-weather', "airport_info_full_data.json")
+
 
 
