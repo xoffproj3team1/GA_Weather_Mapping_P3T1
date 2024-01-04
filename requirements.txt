@@ -6,3 +6,4 @@ numpy
 gunicorn
 flask
 requests
+boto3
