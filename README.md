@@ -107,12 +107,12 @@ The application (code and database) run on server managed by Render.
 <img width="956" alt="Render" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/0ae5633f-802d-4fe8-b8a0-f2971c7a09f8">
 <br> <i> The Web Service, the CRON Job, abd the PostgreSQL Database are hosted on Render</i>
 <br><br><br>
-The CRON Job runs <b>weather_download.py</b> every hour at the top of the hour. Since the CRON Job and the Web Service do not share filesystems, the output of the the CRON Job is saved in a AWS S3 bucket.
+The CRON Job runs <b>weather_download.py</b> every hour at the top of the hour. Since the CRON Job and the Web Service do not share filesystems, the output of the the CRON Job is saved in a AWS S3 bucket to be later read by the Web Service.
 <br><br>
 <img width="1081" alt="AWS_S3" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/9228898d-33ab-4bda-9351-6a4f2dbe30e9">
 <br> <i> The JSON files used by the Javascript are saved on Amazon Web Services</i>
 <br><br><br>
-The Start Command on the Web Service points to a file called __app.py__ (gunicorn app:app), that uses Flask to point to the __index.html__ file. The __index.html__ files then points to the __logic.js__ files that uses fixed URLs pointing to the JSON files from the AWS S3 Bucket.<br>
+The Start Command on the Web Service points to a file called <b>app.py</b> (gunicorn app:app), that uses Flask to point to the <b>index.html</b> file. The <b>index.html</b> files then points to the <b>logic.js</b> files that uses fixed URLs pointing to the JSON files from the AWS S3 Bucket.<br>
 A PostgreSQL database was chosen because it is natively supported by Render, and the testing of the queries is made easy by pgAdmin 4.
 
 
