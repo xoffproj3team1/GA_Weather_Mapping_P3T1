@@ -1,8 +1,10 @@
+let url1='https://ga-weather.s3.us-west-1.amazonaws.com/airport_info_full_data.json'
 
 // To recenter the map on the airport entered in the submit field
 function submitForm() {
   // console.log(airport.value);
-  d3.json("static/airport_info_full_data.json").then(metarInfo => {
+
+  d3.json(url1).then(metarInfo => {
 
     let arpt_coord = [];
     for (let i = 0; i < metarInfo.length; i++) {
@@ -109,7 +111,7 @@ control_layer.addTo(myMap);
 // Addition of the airport makers from the fully populated json file
 
 // Pull the "flight_category property from response.data.
-d3.json("static/airport_info_full_data.json").then(airport_json => {
+d3.json(url1).then(airport_json => {
 
   // Initialize an array to hold the airport circles.
   let metarMarkers = [];
@@ -175,8 +177,9 @@ d3.json("static/airport_info_full_data.json").then(airport_json => {
 
 //******************************************************************
 // Add airmet and sigmet polygones
+let url2='https://ga-weather.s3.us-west-1.amazonaws.com/airsigmet_data.json'
 
-d3.json("static/airsigmet_data.json").then(airport_json => {
+d3.json(url2).then(airport_json => {
 
   var sigConv = [];
   var sigTurb = []
