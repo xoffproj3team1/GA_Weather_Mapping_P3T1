@@ -81,10 +81,11 @@ This database can remain untouched for 28 days until the next cycle is made avai
 
 
 <br>
-The weather data comes from the Aviation Weather Center (https://aviationweather.gov/data/api/#/ ). Instead of polling the data for each each individual airport or SIGMET/AIRMET, we chose to coolect the data for all airports at once. The Metar data (METeorological Aviation Routine Weather Report) is typically issued 5 minutes before each hour and is considered to be valid for one hour. The cache files for the METARs and SIGMET/AIRMET are nonetheless updated every minute.
+The weather data comes from the Aviation Weather Center (https://aviationweather.gov/data/api/#/ ). Instead of polling the data for each each individual airport or SIGMET/AIRMET, we chose to collect the data for all airports at once. The Metar data (METeorological Aviation Routine Weather Report) is typically issued 5 minutes before each hour and is considered to be valid for one hour. The cache files for the METARs and SIGMET/AIRMET are nonetheless updated every minute.
 <br>
 <br><img width="746" alt="AWC_APIs" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/73943e3d-113f-439f-9687-6513c1da7843">
 <br> <i> AWC APIs </i>
+
 
 <br><br>
 The __weather_download.py__ file takes care of:
@@ -101,7 +102,17 @@ The __logic.js__ file has four functions:
 <br><br>
 The __style.css__ file takes care, amongst other things, of the formating of the information in the popup text for the airports.
 <br><br>
-The application (code and database) run on server managed by Render. The Start Command on the Web Service points to a file called __app.py__ (gunicorn app:app), that uses Flask to point to the __index.html__ file.<br>
+The application (code and database) run on server managed by Render.
+<br><br>
+<img width="956" alt="Render" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/0ae5633f-802d-4fe8-b8a0-f2971c7a09f8">
+<br> <i> The Web Service, the CRON Job, abd the PostgreSQL Database are hosted on Render</i>
+<br><br><br>
+The CRON Job runs <b>weather_download.py</b> every hour at the top of the hour. Since the CRON Job and the Web Service do not share filesystems, the output of the the CRON Job is saved in a AWS S3 bucket.
+<br><br>
+<img width="1081" alt="AWS_S3" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/9228898d-33ab-4bda-9351-6a4f2dbe30e9">
+<br> <i> The JSON files used by the Javascript are saved on Amazon Web Services</i>
+<br><br><br>
+The Start Command on the Web Service points to a file called __app.py__ (gunicorn app:app), that uses Flask to point to the __index.html__ file. The __index.html__ files then points to the __logic.js__ files that uses fixed URLs pointing to the JSON files from the AWS S3 Bucket.<br>
 A PostgreSQL database was chosen because it is natively supported by Render, and the testing of the queries is made easy by pgAdmin 4.
 
 
@@ -121,7 +132,7 @@ All the requirements listed in the project are met:
   - Popups window specific to an airport with additional information about its runways and about the wind components to expect for each of them.
   - Layers with SIGMET and AIRMET information relevant to flight planning.
 - The visualization follows FAA standards and is easy to interpret by any certified or student pilot.
-- Additional libraries are leveraged by the code such as __psycopg2__, __gunicorn__, and __dotenv__.
+- Additional libraries are leveraged by the code such as __psycopg2__, __gunicorn__, __boto3__ and __dotenv__.
 - Leveraging of Leaflet LayerControl to add HTML menus
 - Addition of an HTML input box used to move the map to a specific airport.
 - Full ETL workflow with automated renewal of the METAR table.
@@ -131,7 +142,7 @@ All the requirements listed in the project are met:
 - Flask is used by the Web Service to identify the index.html file.
 
 In addition:
-- Full stack application supported on a commercial server.
+- Full stack application supported on a commercial server (Render) with the integration of AWS S3.
 - Code designed for scalability (addition of new features)
 - Code designed to be light on the client 
 
