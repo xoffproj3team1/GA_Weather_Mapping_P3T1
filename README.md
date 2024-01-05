@@ -13,7 +13,7 @@ As best summarized by an old aviation saying: “<i>It’s better to be on the g
 ## Features ##
 The application (https://ga-weather-mapping.onrender.com/) displays by default a __METAR layer__ containing color-coded circles for about 4,880 airports in the US.<br>
 <br><br>
-<img width="576" alt="Webpage_landing" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/a6137341-4306-42fa-9f75-a9a885cfcd0b">
+<img width="1600" alt="Webpage_landing" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/a6137341-4306-42fa-9f75-a9a885cfcd0b">
 <br> <i> Website landing page </i>
 <br>
 
@@ -115,8 +115,13 @@ The CRON Job automatically runs <b>weather_download.py</b> every hour at the top
 <br> <i> The JSON files used by the Javascript are saved on Amazon Web Services</i>
 <br><br><br>
 The Start Command on the Web Service points to a file called <b>app.py</b> (gunicorn app:app), that uses Flask to point to the <b>index.html</b> file. The <b>index.html</b> files then points to the <b>logic.js</b> file that uses fixed URLs pointing to the JSON files from the AWS S3 Bucket.<br>
-A PostgreSQL database was chosen because it is natively supported by Render, and the testing of the queries is made easy by pgAdmin 4.
+<br><br>
+<img width="1081" alt="data_flow" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/f2e3d9f0-fb3f-4206-b308-296f21c7f387">
 
+<br> <i> Summary of the data flow</i>
+<br><br><br>
+A PostgreSQL database was chosen because it is natively supported by Render, and the testing of the queries is made easy by pgAdmin 4.
+<br><br>
 
 ## Ethical Considerations ##
 The data used is not licensed and is freely provided to the public by the US Goverment.<br>
