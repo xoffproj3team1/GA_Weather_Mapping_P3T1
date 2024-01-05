@@ -20,12 +20,12 @@ The application (https://ga-weather-mapping.onrender.com/) displays by default a
 The layer can be toggled on and off. The color coding follows a FAA standard and therefore does not need a legend:
 - Green: Visual Flight Rule (VFR) when the cloud ceiling is greater than 3,000 feet and the visibility greater than 5 statute miles.
 - Blue: Marginal Visual Flight Rule (MVFR) when the cloud ceiling is 1,000 feet to 3,000 feet and/or the visibility 3 to 5 miles inclusive.
-- RED: Instrument Flight Rule (IFR) when the cloud ceiling is 500 feet to less than 1,000 feet and/or the visibility 1 to less than 5 statute miles.
+- Red: Instrument Flight Rule (IFR) when the cloud ceiling is 500 feet to less than 1,000 feet and/or the visibility 1 to less than 5 statute miles.
 - Purple: Low Instrument Flight Rule (LIFR) when the cloud ceiling is less than 500 feet and/or the visibility less than 1 statute miles.
 - Grey: When no weather information is available.
 <br><br>
 <img width="444" alt="METAR_color_coding" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/44120383-a8af-4074-ae11-ac8827f6b6c0">
-<br> <i> View of the airports in the San Francisco Bay Area </i>
+<br> <i> View of the airport locations in the San Francisco Bay Area </i>
 <br><br>
 
 Clicking on a circle will open a popup window containing dynamically populated information relative to the airport:
@@ -130,7 +130,7 @@ The data used is not licensed and is freely provided to the public by the US Gov
 ## Meeting Requirements ##
 All the requirements listed in the project are met:
 - The dataset contains at least 100 unique records.
-  - One of the tables has about 20,000 records. The multi-table query outputs about 13,330 rows that are later displayed as about 4880 unique recors.
+  - One of the tables has about 20,000 records and another has 40,678 records. The multi-table query outputs about 13,330 rows that are later displayed as about 4880 unique records.
 - The data is stored in a PostgreSQL database.
 - Extensive README file with all relevant details including user instructions.
 - The origin and sensitivity of the data is discussed.
