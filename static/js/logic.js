@@ -1,4 +1,13 @@
+
+
+
+
+// URL to the S3 bucket where the json file is. Used in Part1 and Part 3
 let url1='https://ga-weather.s3.us-west-1.amazonaws.com/airport_info_full_data.json'
+
+
+//******************************************************************
+// PART 1
 
 // To recenter the map on the airport entered in the submit field
 function submitForm() {
@@ -21,6 +30,7 @@ function submitForm() {
   })
 };
 
+//******************************************************************
 
 
 
@@ -31,6 +41,7 @@ function submitForm() {
 
 
 //******************************************************************
+// PART 2
 // Create the BaseMap.
 
 // Create the tile layers that will be the background of our map.
@@ -48,8 +59,8 @@ let googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
 });
 
 
-// let faaSectional = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{-y}.png');
-// let faaIFRLow = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/enrl/{z}/{x}/{-y}.png');
+// let faaSectional = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/sec/{z}/{x}/{-y}.png');   // These two additional base maps were working fine until the tile server went offline on Dec 31th
+// let faaIFRLow = L.tileLayer('http://wms.chartbundle.com/tms/1.0.0/enrl/{z}/{x}/{-y}.png');     // Keeping the code in case it gets back online
 
 
 // Create a baseMaps object to hold the map layers.
@@ -89,7 +100,6 @@ legend.onAdd = function (map) {
   div.innerHTML += '<i style="background: #477e17"></i><span>Turbulence Low</span><br>';
   div.innerHTML += '<i style="background: #85b958"></i><span>Turbulence High</span><br>';
   div.innerHTML += '<i style="background: #440d8d"></i><span>IFR</span><br>';
-  // div.innerHTML += '<i style="background: #ff5f65"></i><span>>90</span><br>';
   return div;
 };
 
@@ -108,7 +118,7 @@ control_layer.addTo(myMap);
 
 
 //******************************************************************
-
+// PART 3
 // Addition of the airport makers from the fully populated json file
 
 // Pull the "flight_category property from response.data.
@@ -174,9 +184,8 @@ d3.json(url1).then(airport_json => {
 
 
 
-
-
 //******************************************************************
+// PART 4
 // Add airmet and sigmet polygones
 let url2='https://ga-weather.s3.us-west-1.amazonaws.com/airsigmet_data.json'
 
