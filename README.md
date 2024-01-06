@@ -116,7 +116,7 @@ The CRON Job automatically runs <b>weather_download.py</b> every hour at the top
 <br><br><br>
 The Start Command on the Web Service points to a file called <b>app.py</b> (gunicorn app:app), that uses Flask to point to the <b>index.html</b> file. The <b>index.html</b> files then points to the <b>logic.js</b> file that uses fixed URLs pointing to the JSON files from the AWS S3 Bucket.<br>
 <br><br>
-<img width="1081" alt="data_flow" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/f2e3d9f0-fb3f-4206-b308-296f21c7f387">
+<img width="1081" alt="data_flow" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/a7605b6d-131c-4d8f-811e-27a87845fceb">
 
 <br> <i> Summary of the data flow</i>
 <br><br><br>
