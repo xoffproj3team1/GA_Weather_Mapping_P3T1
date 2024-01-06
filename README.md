@@ -21,7 +21,7 @@ The layer can be toggled on and off. The color coding follows a FAA standard and
 - Green: Visual Flight Rule (VFR) when the cloud ceiling is greater than 3,000 feet and the visibility greater than 5 statute miles.
 - Blue: Marginal Visual Flight Rule (MVFR) when the cloud ceiling is 1,000 feet to 3,000 feet and/or the visibility 3 to 5 miles inclusive.
 - Red: Instrument Flight Rule (IFR) when the cloud ceiling is 500 feet to less than 1,000 feet and/or the visibility 1 to less than 5 statute miles.
-- Purple: Low Instrument Flight Rule (LIFR) when the cloud ceiling is less than 500 feet and/or the visibility less than 1 statute miles.
+- Purple: Low Instrument Flight Rule (LIFR) when the cloud ceiling is less than 500 feet and/or the visibility less than 1 statute mile.
 - Grey: When no weather information is available.
 <br><br>
 <img width="444" alt="METAR_color_coding" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/44120383-a8af-4074-ae11-ac8827f6b6c0">
