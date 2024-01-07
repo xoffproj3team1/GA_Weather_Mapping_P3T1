@@ -64,7 +64,7 @@ They follow the FAA classification for SIGMET (Significant Meteorological Inform
 <br><br>
 
 <img width="1639" alt="icing_popup" src="https://github.com/xoffproj3team1/GA_Weather_Mapping_P3T1/assets/154548045/c1f08b9a-1e2a-4ed9-8394-92b8f34fae47">
-<br> <i> Additional details regading a specific sector at risk of icing </i>
+<br> <i> Additional details regarding a specific sector at risk of icing </i>
 <br><br>
 
 ## Design ##
